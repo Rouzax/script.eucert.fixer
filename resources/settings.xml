@@ -1,82 +1,71 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<settings version="2">
-    <!-- Tab: Providers -->
-    <section id="providers">
+<?xml version="1.0" encoding="UTF-8"?>
+<settings version="1">
+    <section id="script.kijkwijzer.ratings">
+        <!-- Tab: Providers -->
         <category id="providers" label="32001">
             <group id="tmdb_group" label="32010">
-                <setting id="tmdb_api_key" type="string" default="">
+                <setting id="tmdb_api_key" type="string" label="32011" help="32012">
                     <level>0</level>
-                    <label>32011</label>
-                    <help>32012</help>
+                    <default></default>
                     <control type="edit" format="string" />
                 </setting>
             </group>
             <group id="omdb_group" label="32020">
-                <setting id="omdb_api_key" type="string" default="">
+                <setting id="omdb_api_key" type="string" label="32021" help="32022">
                     <level>0</level>
-                    <label>32021</label>
-                    <help>32022</help>
+                    <default></default>
                     <control type="edit" format="string" />
                 </setting>
             </group>
             <group id="kijkwijzer_group" label="32030">
-                <setting id="enable_kijkwijzer" type="boolean" default="true">
+                <setting id="enable_kijkwijzer" type="boolean" label="32031" help="32032">
                     <level>0</level>
-                    <label>32031</label>
-                    <help>32032</help>
+                    <default>true</default>
                     <control type="toggle" />
                 </setting>
             </group>
             <group id="correction_group" label="32040">
-                <setting id="replace_incorrect" type="boolean" default="false">
+                <setting id="replace_incorrect" type="boolean" label="32041" help="32042">
                     <level>0</level>
-                    <label>32041</label>
-                    <help>32042</help>
+                    <default>false</default>
                     <control type="toggle" />
                 </setting>
             </group>
         </category>
-    </section>
 
-    <!-- Tab: Ratings -->
-    <section id="ratings">
+        <!-- Tab: Ratings -->
         <category id="ratings" label="32100">
             <group id="format_group" label="32110">
-                <setting id="target_country" type="string" default="NL">
+                <setting id="target_country" type="string" label="32111" help="32112">
                     <level>0</level>
-                    <label>32111</label>
-                    <help>32112</help>
+                    <default>NL</default>
                     <control type="edit" format="string" />
                 </setting>
-                <setting id="rating_prefix" type="string" default="NL:">
+                <setting id="rating_prefix" type="string" label="32113" help="32114">
                     <level>1</level>
-                    <label>32113</label>
-                    <help>32114</help>
+                    <default>NL:</default>
                     <control type="edit" format="string" />
                 </setting>
             </group>
             <group id="fallback_group" label="32120">
-                <setting id="enable_fallback" type="boolean" default="true">
+                <setting id="enable_fallback" type="boolean" label="32121" help="32122">
                     <level>0</level>
-                    <label>32121</label>
-                    <help>32122</help>
+                    <default>true</default>
                     <control type="toggle" />
                 </setting>
-                <setting id="fallback_rating" type="string" default="NR">
+                <setting id="fallback_rating" type="string" label="32123" help="32124">
                     <level>1</level>
-                    <label>32123</label>
-                    <help>32124</help>
+                    <default>NR</default>
                     <dependencies>
-                        <dependency type="visible" setting="enable_fallback" operator="is">true</dependency>
+                        <dependency type="visible" setting="enable_fallback">true</dependency>
                     </dependencies>
                     <control type="edit" format="string" />
                 </setting>
-                <setting id="retry_days" type="integer" default="30">
+                <setting id="retry_days" type="integer" label="32125" help="32126">
                     <level>1</level>
-                    <label>32125</label>
-                    <help>32126</help>
+                    <default>30</default>
                     <dependencies>
-                        <dependency type="visible" setting="enable_fallback" operator="is">true</dependency>
+                        <dependency type="visible" setting="enable_fallback">true</dependency>
                     </dependencies>
                     <constraints>
                         <minimum>1</minimum>
@@ -87,16 +76,13 @@
                 </setting>
             </group>
         </category>
-    </section>
 
-    <!-- Tab: General -->
-    <section id="general">
+        <!-- Tab: General -->
         <category id="general" label="32200">
             <group id="schedule_group" label="32210">
-                <setting id="scan_interval" type="integer" default="24">
+                <setting id="scan_interval" type="integer" label="32211" help="32212">
                     <level>0</level>
-                    <label>32211</label>
-                    <help>32212</help>
+                    <default>24</default>
                     <constraints>
                         <minimum>1</minimum>
                         <maximum>168</maximum>
@@ -104,10 +90,9 @@
                     </constraints>
                     <control type="spinner" format="integer" />
                 </setting>
-                <setting id="rate_limit" type="number" default="0.25">
+                <setting id="rate_limit" type="number" label="32213" help="32214">
                     <level>2</level>
-                    <label>32213</label>
-                    <help>32214</help>
+                    <default>0.25</default>
                     <constraints>
                         <minimum>0.1</minimum>
                         <maximum>5.0</maximum>
@@ -117,18 +102,16 @@
                 </setting>
             </group>
             <group id="notifications_group" label="32220">
-                <setting id="show_notifications" type="boolean" default="true">
+                <setting id="show_notifications" type="boolean" label="32221" help="32222">
                     <level>0</level>
-                    <label>32221</label>
-                    <help>32222</help>
+                    <default>true</default>
                     <control type="toggle" />
                 </setting>
             </group>
             <group id="debug_group" label="32230">
-                <setting id="logging" type="boolean" default="false">
+                <setting id="logging" type="boolean" label="32231" help="32232">
                     <level>2</level>
-                    <label>32231</label>
-                    <help>32232</help>
+                    <default>false</default>
                     <control type="toggle" />
                 </setting>
             </group>
