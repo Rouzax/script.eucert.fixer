@@ -13,9 +13,12 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-# Section / Category: API Keys
+# =============================================================================
+# Section: Providers (32001-32049)
+# =============================================================================
+
 msgctxt "#32001"
-msgid "API Keys"
+msgid "Providers"
 msgstr ""
 
 # Group: TMDB
@@ -44,14 +47,43 @@ msgctxt "#32022"
 msgid "API key for the Open Movie Database (omdbapi.com). Used as a fallback when TMDB has no rating."
 msgstr ""
 
-# Section / Category: Rating Settings
+# Group: Kijkwijzer.nl
+msgctxt "#32030"
+msgid "Kijkwijzer.nl"
+msgstr ""
+
+msgctxt "#32031"
+msgid "Enable kijkwijzer.nl lookup"
+msgstr ""
+
+msgctxt "#32032"
+msgid "Search the Dutch rating authority website when TMDB and OMDB have no result."
+msgstr ""
+
+# Group: Correction
+msgctxt "#32040"
+msgid "Correction"
+msgstr ""
+
+msgctxt "#32041"
+msgid "Replace incorrect ratings"
+msgstr ""
+
+msgctxt "#32042"
+msgid "Also replace existing ratings that are not valid Kijkwijzer values (e.g. US ratings like R or PG-13). When off, only items with no rating are processed."
+msgstr ""
+
+# =============================================================================
+# Section: Ratings (32100-32149)
+# =============================================================================
+
 msgctxt "#32100"
 msgid "Ratings"
 msgstr ""
 
-# Group: Rating Configuration
+# Group: Rating format
 msgctxt "#32110"
-msgid "Rating configuration"
+msgid "Rating format"
 msgstr ""
 
 msgctxt "#32111"
@@ -59,7 +91,7 @@ msgid "Target country"
 msgstr ""
 
 msgctxt "#32112"
-msgid "ISO 3166-1 country code for the rating system to use (e.g. NL, DE, GB, US)."
+msgid "ISO 3166-1 country code for the rating system to use (e.g. NL for Kijkwijzer)."
 msgstr ""
 
 msgctxt "#32113"
@@ -67,46 +99,49 @@ msgid "Rating prefix"
 msgstr ""
 
 msgctxt "#32114"
-msgid "Text prepended to the rating value. Must match your scraper's format. Check an existing rated item in your library to see the format (e.g. 'Rated 12' means the prefix is 'Rated ')."
+msgid "Text prepended to the rating value when writing to the library. Must match your scraper format. For the TMDb scraper this is typically your country code followed by a colon (e.g. NL:)."
 msgstr ""
 
-msgctxt "#32115"
+# Group: Fallback
+msgctxt "#32120"
+msgid "Fallback"
+msgstr ""
+
+msgctxt "#32121"
+msgid "Enable fallback rating"
+msgstr ""
+
+msgctxt "#32122"
+msgid "Apply a default rating to items that no source can resolve after the retry window expires."
+msgstr ""
+
+msgctxt "#32123"
 msgid "Fallback rating"
 msgstr ""
 
-msgctxt "#32116"
-msgid "Rating to apply when no source can find a result and the retry window has expired. Leave empty to skip items without a rating."
+msgctxt "#32124"
+msgid "Rating to apply when no source can find a result and the retry window has expired."
 msgstr ""
 
-msgctxt "#32117"
+msgctxt "#32125"
 msgid "Retry days"
 msgstr ""
 
-msgctxt "#32118"
+msgctxt "#32126"
 msgid "Number of days to keep retrying before applying the fallback rating. New releases often get certifications added later."
 msgstr ""
 
-# Group: Providers
-msgctxt "#32130"
-msgid "Providers"
-msgstr ""
+# =============================================================================
+# Section: General (32200-32249)
+# =============================================================================
 
-msgctxt "#32131"
-msgid "Enable kijkwijzer.nl lookup"
-msgstr ""
-
-msgctxt "#32132"
-msgid "Search the Dutch rating authority website (kijkwijzer.nl) when TMDB and OMDB have no result."
-msgstr ""
-
-# Section / Category: Schedule
 msgctxt "#32200"
-msgid "Schedule"
+msgid "General"
 msgstr ""
 
-# Group: Timing
+# Group: Schedule
 msgctxt "#32210"
-msgid "Scan timing"
+msgid "Schedule"
 msgstr ""
 
 msgctxt "#32211"
@@ -114,7 +149,7 @@ msgid "Scan interval (hours)"
 msgstr ""
 
 msgctxt "#32212"
-msgid "How often to check the library for items with missing ratings."
+msgid "How often to check the library for items needing ratings. A scan also runs automatically after each library update."
 msgstr ""
 
 msgctxt "#32213"
@@ -125,20 +160,28 @@ msgctxt "#32214"
 msgid "Delay between external API calls. Increase if you hit rate limits."
 msgstr ""
 
-# Section / Category: Advanced
-msgctxt "#32300"
-msgid "Advanced"
+# Group: Notifications
+msgctxt "#32220"
+msgid "Notifications"
+msgstr ""
+
+msgctxt "#32221"
+msgid "Show notifications"
+msgstr ""
+
+msgctxt "#32222"
+msgid "Show a Kodi notification after a scan completes with new ratings."
 msgstr ""
 
 # Group: Debugging
-msgctxt "#32310"
+msgctxt "#32230"
 msgid "Debugging"
 msgstr ""
 
-msgctxt "#32311"
+msgctxt "#32231"
 msgid "Enable debug logging"
 msgstr ""
 
-msgctxt "#32312"
+msgctxt "#32232"
 msgid "Write detailed diagnostic information to a separate log file."
 msgstr ""

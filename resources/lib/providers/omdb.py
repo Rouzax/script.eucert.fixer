@@ -17,7 +17,7 @@ from typing import Dict, Optional, Tuple
 import requests
 
 from resources.lib.constants import OMDB_BASE_URL
-from resources.lib.utils import get_logger
+from resources.lib.utils import ApiKeyError, get_logger
 
 log = get_logger('omdb')
 
@@ -42,6 +42,9 @@ def lookup(
         log.warning("Request failed", event="omdb.error",
                     imdb_id=imdb_id, error=str(e))
         return None, None
+
+    if resp.status_code == 401:
+        raise ApiKeyError("omdb")
 
     if resp.status_code != 200:
         log.warning("Unexpected status", event="omdb.error",

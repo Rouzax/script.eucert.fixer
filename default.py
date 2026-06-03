@@ -10,7 +10,7 @@ Logging:
         - manual.start (INFO): Manual scan triggered
         - manual.complete (INFO): Manual scan finished
 """
-from resources.lib.utils import get_logger
+from resources.lib.utils import get_bool_setting, get_logger, notify
 from resources.lib.data.backfill import backfill
 from resources.lib.data.media_types import MOVIE, TVSHOW
 
@@ -33,6 +33,12 @@ def main() -> None:
     )
     log.info("Manual scan complete", event="manual.complete",
              ratings_set=total)
+
+    if get_bool_setting('show_notifications'):
+        if total > 0:
+            notify("Set {} rating{}".format(total, "s" if total != 1 else ""))
+        else:
+            notify("No new ratings found")
 
 
 if __name__ == '__main__':

@@ -23,6 +23,7 @@ from typing import Any, Dict, Generator, Optional, TextIO, Union
 
 import xbmc
 import xbmcaddon
+import xbmcgui
 import xbmcvfs
 
 from resources.lib.constants import (
@@ -82,6 +83,14 @@ def get_float_setting(setting_id: str, default: float = 0.0) -> float:
 def lang(string_id: int) -> str:
     """Get localized string."""
     return get_addon().getLocalizedString(string_id)
+
+
+class ApiKeyError(Exception):
+    """Raised when a provider returns HTTP 401 (invalid API key)."""
+
+    def __init__(self, provider: str) -> None:
+        self.provider = provider
+        super().__init__("Invalid API key for {}".format(provider))
 
 
 # =============================================================================
@@ -304,6 +313,21 @@ def get_logger(module_name: str) -> StructuredLogger:
         StructuredLogger.initialize(debug_enabled=debug_enabled, addon_id=addon_id)
 
     return StructuredLogger(module_name)
+
+
+_notify_log = StructuredLogger('notify')
+
+
+def notify(message: str, time_ms: int = 5000) -> None:
+    """Show a Kodi notification with the addon icon."""
+    try:
+        addon = get_addon()
+        heading = addon.getAddonInfo('name')
+        icon = addon.getAddonInfo('icon')
+        xbmcgui.Dialog().notification(heading, message, icon, time_ms)
+        _notify_log.debug("Notification shown", text=message)
+    except RuntimeError:
+        pass
 
 
 # =============================================================================

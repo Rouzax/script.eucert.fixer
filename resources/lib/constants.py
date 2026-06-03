@@ -38,55 +38,20 @@ DEFAULT_RATE_LIMIT_SEC = 0.25
 # Days to retry unresolved items before applying fallback
 DEFAULT_RETRY_DAYS = 30
 
+# Seconds to wait after library scan/clean finishes before triggering a rating scan
+LIBRARY_SCAN_DEBOUNCE_SEC = 60
+
 # =============================================================================
 # Rating Defaults
 # =============================================================================
 
 DEFAULT_TARGET_COUNTRY = "NL"
-DEFAULT_RATING_PREFIX = "Rated "
+DEFAULT_RATING_PREFIX = "NL:"
 DEFAULT_FALLBACK_RATING = "NR"
 
 # Valid Kijkwijzer age ratings
 VALID_RATINGS = ("AL", "6", "9", "12", "14", "16", "18")
-
-# Inference country chain: ordered by cultural similarity to NL.
-# Each country's ratings get mapped to the target scale.
-INFERENCE_COUNTRIES = ["BE", "DE", "AT", "FR", "GB", "DK", "SE", "US"]
-
-# Rating mappings: foreign country rating -> NL Kijkwijzer equivalent.
-# Conservative rounding: always maps to the stricter bracket.
-RATING_MAPPINGS = {
-    "BE": {
-        "AL": "AL", "6": "6", "9": "9", "12": "12",
-        "14": "14", "16": "16", "18": "18",
-    },
-    "DE": {
-        "0": "AL", "6": "6", "12": "12", "16": "16", "18": "18",
-    },
-    "AT": {
-        "0": "AL", "6": "6", "10": "12", "12": "12",
-        "14": "14", "16": "16", "18": "18",
-    },
-    "FR": {
-        "U": "AL", "10": "12", "12": "12", "16": "16", "18": "18",
-    },
-    "GB": {
-        "U": "AL", "PG": "6", "12": "12", "12A": "12",
-        "15": "16", "18": "18", "R18": "18",
-    },
-    "DK": {
-        "A": "AL", "7": "6", "11": "12", "15": "16",
-    },
-    "SE": {
-        "Btl": "AL", "7": "6", "11": "12", "15": "16",
-    },
-    "US": {
-        "G": "AL", "PG": "6", "PG-13": "12",
-        "R": "16", "NC-17": "18",
-        "TV-Y": "AL", "TV-Y7": "6", "TV-G": "AL",
-        "TV-PG": "9", "TV-14": "14", "TV-MA": "16",
-    },
-}
+KNOWN_RATING_PREFIXES = ("Rated ",)
 
 # =============================================================================
 # Tracker
@@ -95,6 +60,13 @@ RATING_MAPPINGS = {
 TRACKER_DIR = "trackers"
 TRACKER_MOVIES_FILENAME = "unresolved_movies.json"
 TRACKER_TVSHOWS_FILENAME = "unresolved_tvshows.json"
+
+# =============================================================================
+# Inference Config
+# =============================================================================
+
+CONFIG_DIR = "config"
+CONFIG_FILENAME = "inference.json"
 
 # =============================================================================
 # External APIs

@@ -23,14 +23,16 @@ from resources.lib.constants import (
     DEFAULT_RETRY_DAYS,
     DEFAULT_TARGET_COUNTRY,
     DEFAULT_RATING_PREFIX,
-    INFERENCE_COUNTRIES,
-    RATING_MAPPINGS,
 )
-from resources.lib.data.kodi import get_missing_ratings, update_rating
+from resources.lib.config import load_inference_config
+from resources.lib.data.kodi import get_items_needing_ratings, update_rating
 from resources.lib.data.media_types import MediaType
 from resources.lib.data.tracker import load_tracker, save_tracker, should_apply_fallback
 from resources.lib.providers import tmdb, omdb, kijkwijzer
-from resources.lib.utils import get_logger, get_setting, get_bool_setting, get_int_setting, get_float_setting
+from resources.lib.utils import (
+    ApiKeyError, get_logger, get_setting, get_bool_setting,
+    get_int_setting, get_float_setting, notify,
+)
 
 log = get_logger('backfill')
 
@@ -46,16 +48,25 @@ def backfill(media_type: MediaType) -> Dict[str, int]:
     omdb_key = get_setting('omdb_api_key')
     target = get_setting('target_country') or DEFAULT_TARGET_COUNTRY
     prefix = get_setting('rating_prefix') or DEFAULT_RATING_PREFIX
-    fallback_rating = get_setting('fallback_rating') or DEFAULT_FALLBACK_RATING
-    retry_days = get_int_setting('retry_days', DEFAULT_RETRY_DAYS)
+    enable_fallback = get_bool_setting('enable_fallback')
+    fallback_rating = ""
+    retry_days = DEFAULT_RETRY_DAYS
+    if enable_fallback:
+        raw_fallback = get_setting('fallback_rating')
+        fallback_rating = raw_fallback if raw_fallback else DEFAULT_FALLBACK_RATING
+        retry_days = get_int_setting('retry_days', DEFAULT_RETRY_DAYS)
     rate_limit = get_float_setting('rate_limit', DEFAULT_RATE_LIMIT_SEC)
     use_kijkwijzer = get_bool_setting('enable_kijkwijzer')
+    replace_incorrect = get_bool_setting('replace_incorrect')
+    inference_cfg = load_inference_config()
+    inference_countries = inference_cfg["inference_countries"]
+    mappings = inference_cfg["mappings"]
 
     # Load tracker for this media type
     unresolved = load_tracker(media_type.tracker_filename)
 
-    # Query Kodi for items with missing ratings
-    items = get_missing_ratings(media_type)
+    # Query Kodi for items needing ratings
+    items = get_items_needing_ratings(media_type, replace_incorrect, fallback_rating)
     log.info("Scan starting", event="backfill.start",
              media_type=media_type.label, missing_count=len(items))
 
@@ -69,32 +80,60 @@ def backfill(media_type: MediaType) -> Dict[str, int]:
         "error": 0,
     }
 
+    tmdb_valid = True
+    omdb_valid = True
+    api_key_notified = False
+
     for item in items:
         item_id = item["id"]
         title = item["title"]
         tmdb_id = item["tmdb_id"]
         imdb_id = item["imdb_id"]
+        tvdb_id = item["tvdb_id"]
+
+        if tmdb_key and not tmdb_valid:
+            log.debug("Skipping TMDB (auth failed)", title=title)
+        if omdb_key and not omdb_valid:
+            log.debug("Skipping OMDB (auth failed)", title=title)
 
         rating: Optional[str] = None
         source: Optional[str] = None
 
         try:
+            # Resolve TMDB ID from TVDB/IMDB when missing
+            if not tmdb_id and tmdb_key and tmdb_valid:
+                tmdb_id = tmdb.resolve_id(tmdb_key, tvdb_id=tvdb_id, imdb_id=imdb_id)
+                if tmdb_id:
+                    time.sleep(rate_limit)
+
             # Tier 1+2: TMDB direct + inference
-            if not rating and tmdb_id and tmdb_key:
+            if not rating and tmdb_id and tmdb_key and tmdb_valid:
                 rating, source = tmdb.lookup(
                     tmdb_id, tmdb_key, target,
-                    INFERENCE_COUNTRIES, RATING_MAPPINGS, media_type,
+                    inference_countries, mappings, media_type,
                 )
                 time.sleep(rate_limit)
 
             # Tier 3: OMDB
-            if not rating and imdb_id and omdb_key:
-                rating, source = omdb.lookup(imdb_id, omdb_key, RATING_MAPPINGS)
+            if not rating and imdb_id and omdb_key and omdb_valid:
+                rating, source = omdb.lookup(imdb_id, omdb_key, mappings)
                 time.sleep(rate_limit)
 
             # Tier 4: Kijkwijzer.nl
             if not rating and use_kijkwijzer:
                 rating, source = kijkwijzer.lookup(title, rate_limit)
+
+        except ApiKeyError as e:
+            if e.provider == "tmdb":
+                tmdb_valid = False
+            elif e.provider == "omdb":
+                omdb_valid = False
+            log.error("Invalid API key", event="backfill.auth_error",
+                      provider=e.provider)
+            if not api_key_notified:
+                notify("{} API key is invalid".format(e.provider.upper()))
+                api_key_notified = True
+            continue
 
         except Exception:
             log.exception("Provider error", event="backfill.provider_error",

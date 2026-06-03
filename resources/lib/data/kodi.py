@@ -12,19 +12,59 @@ Logging:
 """
 from __future__ import annotations
 
+import re
 from typing import Any, Dict, List
 
+from resources.lib.constants import KNOWN_RATING_PREFIXES, VALID_RATINGS
 from resources.lib.data.media_types import MediaType
 from resources.lib.utils import get_logger, json_query
 
 log = get_logger('data')
 
+_COUNTRY_PREFIX_RE = re.compile(r'^[A-Z]{2,3}:')
 
-def get_missing_ratings(media_type: MediaType) -> List[Dict[str, Any]]:
+
+def _strip_rating_prefix(mpaa: str) -> str:
+    """Strip known prefixes to extract the bare rating value."""
+    if not mpaa:
+        return ""
+    match = _COUNTRY_PREFIX_RE.match(mpaa)
+    if match:
+        return mpaa[match.end():]
+    for prefix in KNOWN_RATING_PREFIXES:
+        if mpaa.startswith(prefix):
+            return mpaa[len(prefix):]
+    return mpaa
+
+
+def _needs_rating(mpaa: str, replace_incorrect: bool, fallback_rating: str) -> bool:
+    """Check whether an item's mpaa value needs a Kijkwijzer rating."""
+    if not mpaa:
+        return True
+    if not replace_incorrect:
+        return False
+    bare = _strip_rating_prefix(mpaa)
+    if bare in VALID_RATINGS:
+        return False
+    if fallback_rating and bare == fallback_rating:
+        return False
+    log.debug("Flagged for replacement", mpaa=mpaa, stripped=bare)
+    return True
+
+
+def get_items_needing_ratings(
+    media_type: MediaType,
+    replace_incorrect: bool = False,
+    fallback_rating: str = "",
+) -> List[Dict[str, Any]]:
     """
-    Query Kodi library for items with empty mpaa field.
+    Query Kodi library for items needing a Kijkwijzer rating.
 
-    Returns a list of dicts with keys: id, title, tmdb_id, imdb_id.
+    When replace_incorrect is False, only items with empty mpaa are returned.
+    When True, items with non-Kijkwijzer ratings (e.g. US ratings like R,
+    PG-13, TV-MA) are also included.
+
+    Returns a list of dicts: id, title, tmdb_id, imdb_id, tvdb_id.
     """
     query = {
         "jsonrpc": "2.0",
@@ -42,20 +82,24 @@ def get_missing_ratings(media_type: MediaType) -> List[Dict[str, Any]]:
     log.debug("Library query returned items",
               media_type=media_type.name, total=len(all_items))
 
-    missing = []
+    candidates = []
     for item in all_items:
-        if not item.get("mpaa"):
-            missing.append({
+        mpaa = item.get("mpaa", "")
+        if _needs_rating(mpaa, replace_incorrect, fallback_rating):
+            uniqueid = item.get("uniqueid", {})
+            candidates.append({
                 "id": item[media_type.kodi_id_field],
                 "title": item.get("title", ""),
-                "tmdb_id": item.get("uniqueid", {}).get("tmdb"),
-                "imdb_id": item.get("uniqueid", {}).get("imdb"),
+                "tmdb_id": uniqueid.get("tmdb"),
+                "imdb_id": uniqueid.get("imdb"),
+                "tvdb_id": uniqueid.get("tvdb"),
             })
 
-    log.debug("Items with missing ratings",
-              media_type=media_type.name, count=len(missing))
+    log.debug("Items needing ratings",
+              media_type=media_type.name, count=len(candidates),
+              replace_incorrect=replace_incorrect)
 
-    return missing
+    return candidates
 
 
 def update_rating(

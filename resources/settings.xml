@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <settings version="2">
-    <!-- Category: API Keys -->
-    <section id="api_keys">
-        <category id="api_keys" label="32001">
+    <!-- Tab: Providers -->
+    <section id="providers">
+        <category id="providers" label="32001">
             <group id="tmdb_group" label="32010">
                 <setting id="tmdb_api_key" type="string" default="">
                     <level>0</level>
@@ -19,35 +19,65 @@
                     <control type="edit" format="string" />
                 </setting>
             </group>
+            <group id="kijkwijzer_group" label="32030">
+                <setting id="enable_kijkwijzer" type="boolean" default="true">
+                    <level>0</level>
+                    <label>32031</label>
+                    <help>32032</help>
+                    <control type="toggle" />
+                </setting>
+            </group>
+            <group id="correction_group" label="32040">
+                <setting id="replace_incorrect" type="boolean" default="false">
+                    <level>0</level>
+                    <label>32041</label>
+                    <help>32042</help>
+                    <control type="toggle" />
+                </setting>
+            </group>
         </category>
     </section>
 
-    <!-- Category: Rating Settings -->
+    <!-- Tab: Ratings -->
     <section id="ratings">
         <category id="ratings" label="32100">
-            <group id="rating_config" label="32110">
+            <group id="format_group" label="32110">
                 <setting id="target_country" type="string" default="NL">
                     <level>0</level>
                     <label>32111</label>
                     <help>32112</help>
                     <control type="edit" format="string" />
                 </setting>
-                <setting id="rating_prefix" type="string" default="Rated ">
+                <setting id="rating_prefix" type="string" default="NL:">
                     <level>1</level>
                     <label>32113</label>
                     <help>32114</help>
                     <control type="edit" format="string" />
                 </setting>
+            </group>
+            <group id="fallback_group" label="32120">
+                <setting id="enable_fallback" type="boolean" default="true">
+                    <level>0</level>
+                    <label>32121</label>
+                    <help>32122</help>
+                    <control type="toggle" />
+                </setting>
                 <setting id="fallback_rating" type="string" default="NR">
                     <level>1</level>
-                    <label>32115</label>
-                    <help>32116</help>
+                    <label>32123</label>
+                    <help>32124</help>
+                    <dependencies>
+                        <dependency type="visible" setting="enable_fallback" operator="is">true</dependency>
+                    </dependencies>
                     <control type="edit" format="string" />
                 </setting>
                 <setting id="retry_days" type="integer" default="30">
                     <level>1</level>
-                    <label>32117</label>
-                    <help>32118</help>
+                    <label>32125</label>
+                    <help>32126</help>
+                    <dependencies>
+                        <dependency type="visible" setting="enable_fallback" operator="is">true</dependency>
+                    </dependencies>
                     <constraints>
                         <minimum>1</minimum>
                         <maximum>365</maximum>
@@ -56,21 +86,13 @@
                     <control type="spinner" format="integer" />
                 </setting>
             </group>
-            <group id="providers" label="32130">
-                <setting id="enable_kijkwijzer" type="boolean" default="true">
-                    <level>0</level>
-                    <label>32131</label>
-                    <help>32132</help>
-                    <control type="toggle" />
-                </setting>
-            </group>
         </category>
     </section>
 
-    <!-- Category: Schedule -->
-    <section id="schedule">
-        <category id="schedule" label="32200">
-            <group id="timing" label="32210">
+    <!-- Tab: General -->
+    <section id="general">
+        <category id="general" label="32200">
+            <group id="schedule_group" label="32210">
                 <setting id="scan_interval" type="integer" default="24">
                     <level>0</level>
                     <label>32211</label>
@@ -94,17 +116,19 @@
                     <control type="spinner" format="number" />
                 </setting>
             </group>
-        </category>
-    </section>
-
-    <!-- Category: Advanced -->
-    <section id="advanced">
-        <category id="advanced" label="32300">
-            <group id="debugging" label="32310">
+            <group id="notifications_group" label="32220">
+                <setting id="show_notifications" type="boolean" default="true">
+                    <level>0</level>
+                    <label>32221</label>
+                    <help>32222</help>
+                    <control type="toggle" />
+                </setting>
+            </group>
+            <group id="debug_group" label="32230">
                 <setting id="logging" type="boolean" default="false">
                     <level>2</level>
-                    <label>32311</label>
-                    <help>32312</help>
+                    <label>32231</label>
+                    <help>32232</help>
                     <control type="toggle" />
                 </setting>
             </group>

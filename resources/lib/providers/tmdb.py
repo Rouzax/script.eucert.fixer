@@ -20,9 +20,72 @@ import requests
 
 from resources.lib.constants import TMDB_BASE_URL
 from resources.lib.data.media_types import MediaType
-from resources.lib.utils import get_logger
+from resources.lib.utils import ApiKeyError, get_logger
 
 log = get_logger('tmdb')
+
+
+def resolve_id(
+    api_key: str,
+    tvdb_id: Optional[str] = None,
+    imdb_id: Optional[str] = None,
+) -> Optional[str]:
+    """
+    Resolve a TMDB ID from an external ID using the /find endpoint.
+
+    Tries tvdb_id first, then imdb_id. Returns the TMDB ID as a string,
+    or None if resolution fails.
+    """
+    external_id = None
+    source = None
+    if tvdb_id:
+        external_id = tvdb_id
+        source = "tvdb_id"
+    elif imdb_id:
+        external_id = imdb_id
+        source = "imdb_id"
+
+    if not external_id:
+        return None
+
+    url = "{}/find/{}".format(TMDB_BASE_URL, external_id)
+
+    try:
+        resp = requests.get(
+            url,
+            params={"api_key": api_key, "external_source": source},
+            timeout=10,
+        )
+    except requests.RequestException as e:
+        log.warning("Resolve request failed", event="tmdb.error",
+                    external_id=external_id, error=str(e))
+        return None
+
+    if resp.status_code == 401:
+        raise ApiKeyError("tmdb")
+
+    if resp.status_code != 200:
+        log.debug("Resolve returned unexpected status",
+                  external_id=external_id, status=resp.status_code)
+        return None
+
+    try:
+        data = resp.json()
+    except ValueError:
+        return None
+
+    for key in ("movie_results", "tv_results"):
+        results = data.get(key, [])
+        if results:
+            resolved_id = results[0].get("id")
+            if resolved_id is not None:
+                log.debug("Resolved TMDB ID", external_id=external_id,
+                          source=source, tmdb_id=resolved_id)
+                return str(resolved_id)
+
+    log.debug("Could not resolve TMDB ID", external_id=external_id,
+              source=source)
+    return None
 
 
 def lookup(
@@ -47,6 +110,9 @@ def lookup(
         log.warning("Request failed", event="tmdb.error",
                     tmdb_id=tmdb_id, error=str(e))
         return None, None
+
+    if resp.status_code == 401:
+        raise ApiKeyError("tmdb")
 
     if resp.status_code != 200:
         log.warning("Unexpected status", event="tmdb.error",
