@@ -7,6 +7,9 @@
                 <setting id="tmdb_api_key" type="string" label="32011" help="32012">
                     <level>0</level>
                     <default></default>
+                    <constraints>
+                        <allowempty>true</allowempty>
+                    </constraints>
                     <control type="edit" format="string" />
                 </setting>
             </group>
@@ -14,6 +17,9 @@
                 <setting id="omdb_api_key" type="string" label="32021" help="32022">
                     <level>0</level>
                     <default></default>
+                    <constraints>
+                        <allowempty>true</allowempty>
+                    </constraints>
                     <control type="edit" format="string" />
                 </setting>
             </group>

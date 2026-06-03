@@ -45,6 +45,12 @@ def backfill(media_type: MediaType) -> Dict[str, int]:
     """
     # Read settings
     tmdb_key = get_setting('tmdb_api_key')
+    if not tmdb_key:
+        log.warning("TMDB API key not configured, skipping scan",
+                    event="backfill.skip", media_type=media_type.label)
+        return {"tmdb_direct": 0, "tmdb_inferred": 0, "omdb": 0,
+                "kijkwijzer": 0, "fallback": 0, "pending": 0, "error": 0}
+
     omdb_key = get_setting('omdb_api_key')
     target = get_setting('target_country') or DEFAULT_TARGET_COUNTRY
     prefix = get_setting('rating_prefix') or DEFAULT_RATING_PREFIX
