@@ -74,7 +74,7 @@ def run() -> None:
 
     log.info("Service started", event="service.start")
 
-    last_scan: float = 0.0
+    last_scan: float = time.time()
 
     try:
         while not monitor.abortRequested():

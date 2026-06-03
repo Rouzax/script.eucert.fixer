@@ -17,6 +17,9 @@ CLAUDE.md
 .mcp.json
 docs/superpowers/
 
+# Local working docs
+TODO.md
+
 # Development tools
 pyrightconfig.json
 .pyflakes
