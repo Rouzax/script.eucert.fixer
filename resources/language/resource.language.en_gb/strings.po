@@ -57,7 +57,7 @@ msgid "Enable kijkwijzer.nl lookup"
 msgstr ""
 
 msgctxt "#32032"
-msgid "Search the Dutch rating authority website when TMDB and OMDB have no result."
+msgid "Search the Dutch rating authority website (kijkwijzer.nl) when TMDB and OMDB have no result. Uses web scraping, which may break if the website changes its layout."
 msgstr ""
 
 # Group: Correction
@@ -149,7 +149,7 @@ msgid "Scan interval (hours)"
 msgstr ""
 
 msgctxt "#32212"
-msgid "How often to check the library for items needing ratings. A scan also runs automatically after each library update."
+msgid "How often to check the library for items needing ratings. A scan also runs automatically after each library update. If multiple Kodi instances share a database, only enable this addon on one instance to avoid duplicate API calls."
 msgstr ""
 
 msgctxt "#32213"
