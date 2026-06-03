@@ -1,0 +1,17 @@
+:root {
+  --md-primary-fg-color: #F5A623;
+  --md-primary-fg-color--light: #F5C564;
+  --md-primary-fg-color--dark: #D4912A;
+  --md-accent-fg-color: #F5A623;
+}
+
+[data-md-color-scheme="slate"] {
+  --md-primary-fg-color: #F5A623;
+  --md-primary-fg-color--light: #F5C564;
+  --md-primary-fg-color--dark: #D4912A;
+  --md-accent-fg-color: #F5C564;
+}
+
+/* Theme-aware logo: show dark text on light, white text on dark */
+[data-md-color-scheme="default"] .only-dark { display: none; }
+[data-md-color-scheme="slate"] .only-light { display: none; }

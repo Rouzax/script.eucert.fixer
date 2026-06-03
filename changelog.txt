@@ -1,0 +1,8 @@
+v0.1.0 (2026-xx-xx)
+- Initial release
+- Background service with configurable scan interval
+- TMDB direct and inferred rating lookup
+- OMDB fallback rating lookup
+- Kijkwijzer.nl scraping
+- Retry tracking for unresolved items
+- Structured debug logging to separate file

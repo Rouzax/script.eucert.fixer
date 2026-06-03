@@ -1,0 +1,34 @@
+# Python
+__pycache__/
+*.py[cod]
+*.log
+
+# IDE
+.vscode/
+.idea/
+
+# Kodi
+*.pyo
+
+# Claude Code / MCP
+CLAUDE.md
+.claude/
+.claudeignore
+.mcp.json
+docs/superpowers/
+
+# Development tools
+pyrightconfig.json
+.pyflakes
+.ruff_cache/
+.pytest_cache/
+tests/
+conftest.py
+pytest.ini
+
+# Build output
+build/
+
+# Temp
+_temp/
+.worktrees/
