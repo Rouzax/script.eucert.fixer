@@ -163,9 +163,10 @@ Operated by the Danish Media Council for Children and Young People.
 | 7 | 7+ | May be distressing for young children |
 | 11 | 11+ | Contains themes that may disturb children under 11 |
 | 15 | 15+ | Contains themes unsuitable for children under 15 |
+| F | Exempt | Exempt from classification |
 
 ??? info "How this system differs"
-    - Only 4 categories, making it one of the simplest systems in Europe.
+    - Only 5 categories, making it one of the simplest systems in Europe. The F (exempt) category is rarely used and applies to content that bypasses the normal classification process.
     - Focused solely on potential harm to children's wellbeing. Moral or artistic judgment is not considered.
     - Does not use content descriptors. The age threshold alone carries the classification.
 

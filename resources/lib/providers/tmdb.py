@@ -24,6 +24,25 @@ from resources.lib.utils import ApiKeyError, get_logger
 
 log = get_logger('tmdb')
 
+# TMDB uses different certification strings for SE TV vs SE movies.
+# Normalize TV format ("Från 7 år") to movie format ("7") so the rest
+# of the pipeline only sees one set of values per country.
+_CERT_NORMALIZE = {
+    "SE": {
+        "Från 7 år": "7",
+        "Från 11 år": "11",
+        "Från 15 år": "15",
+    },
+}
+
+
+def _normalize_certs(certs: Dict[str, str]) -> Dict[str, str]:
+    """Normalize country-specific certification aliases to canonical values."""
+    for country, table in _CERT_NORMALIZE.items():
+        if country in certs:
+            certs[country] = table.get(certs[country], certs[country])
+    return certs
+
 
 def resolve_id(
     api_key: str,
@@ -126,7 +145,7 @@ def lookup(
                     tmdb_id=tmdb_id)
         return None, None
 
-    certs = media_type.tmdb_parse_certs(results)
+    certs = _normalize_certs(media_type.tmdb_parse_certs(results))
     target = target_country.upper()
 
     # Direct match
