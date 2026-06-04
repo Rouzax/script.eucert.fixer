@@ -11,7 +11,9 @@
                library="service.py"
                start="login" />
     <extension point="xbmc.python.script"
-               library="default.py" />
+               library="default.py">
+        <provides>executable</provides>
+    </extension>
     <extension point="xbmc.python.library"
                library="resources/lib" />
     <extension point="xbmc.addon.metadata">

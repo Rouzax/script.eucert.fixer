@@ -15,7 +15,7 @@ If Kodi was already running when you installed the addon, the background service
 The prefix must match what your Kodi scraper already writes to the library. Find an item that already has a rating and check its format on the info screen (for example, `NL:12` or `Rated PG-13`). Compare this to the "Rating prefix" setting in the addon. If they do not match, any rating the addon writes will not display correctly.
 
 **Enable debug logging.**
-In the addon settings under **General**, turn on debug logging. Restart Kodi to trigger a new scan, then check the log file for details on what the addon found and did not find. See [Log file location](#log-file-location) below.
+In the addon settings under **General**, turn on debug logging. Then go to **Programs** > **Add-ons** > **EU Certification Fixer** to trigger a scan. Check the log file for details on what the addon found and did not find. See [Log file location](#log-file-location) below.
 
 ---
 

@@ -33,7 +33,7 @@ After installation:
 3. On the **Ratings** tab, select your country from the dropdown.
 4. Close the settings dialog.
 
-The addon starts its background service automatically when Kodi boots. The first scan runs when Kodi finishes a library update, or after the configured scan interval (default: 24 hours), whichever comes first. To scan immediately, go to **Add-ons** > **EU Certification Fixer** and run it manually.
+The addon starts its background service automatically when Kodi boots. The first scan runs when Kodi finishes a library update, or after the configured scan interval (default: 24 hours), whichever comes first. To scan immediately, go to **Programs** > **Add-ons** > **EU Certification Fixer**. This triggers a one-time scan outside the normal schedule.
 
 !!! tip "Match your scraper settings"
 

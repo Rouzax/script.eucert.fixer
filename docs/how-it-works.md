@@ -2,7 +2,9 @@
 
 ## When does the addon scan?
 
-The addon runs as a background service that starts automatically when Kodi boots. It scans your library on startup, after every library update, and on a repeating schedule (default: every 24 hours). The addon does not scan while you are watching a video, to avoid interfering with playback.
+The addon runs as a background service that starts automatically when Kodi boots. It scans your library after every library update and on a repeating schedule (default: every 24 hours). The addon does not scan while you are watching a video, to avoid interfering with playback.
+
+You can also trigger a scan manually at any time from **Programs** > **Add-ons** > **EU Certification Fixer**.
 
 ## What happens during a scan?
 
