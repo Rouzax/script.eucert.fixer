@@ -51,12 +51,17 @@ def _needs_rating(
     replace_incorrect: bool,
     fallback_rating: str,
     valid_ratings: Tuple[str, ...] = (),
+    rating_prefix: str = "",
 ) -> bool:
     """Check whether an item's mpaa value needs a rating for the target system."""
     if not mpaa:
         return True
     if not replace_incorrect:
         return False
+    if rating_prefix and _has_wrong_prefix(mpaa, rating_prefix):
+        log.debug("Flagged for replacement (wrong prefix)",
+                  mpaa=mpaa, expected_prefix=rating_prefix)
+        return True
     bare = _strip_rating_prefix(mpaa)
     if bare in valid_ratings:
         return False
@@ -66,18 +71,30 @@ def _needs_rating(
     return True
 
 
+def _has_wrong_prefix(mpaa: str, expected_prefix: str) -> bool:
+    """Check if mpaa has a country or known prefix that differs from expected."""
+    match = _COUNTRY_PREFIX_RE.match(mpaa)
+    if match:
+        return mpaa[:match.end()] != expected_prefix
+    for prefix in KNOWN_RATING_PREFIXES:
+        if mpaa.startswith(prefix):
+            return prefix != expected_prefix
+    return False
+
+
 def get_items_needing_ratings(
     media_type: MediaType,
     replace_incorrect: bool = False,
     fallback_rating: str = "",
     valid_ratings: Tuple[str, ...] = (),
+    rating_prefix: str = "",
 ) -> List[Dict[str, Any]]:
     """
     Query Kodi library for items needing a rating.
 
     When replace_incorrect is False, only items with empty mpaa are returned.
-    When True, items whose existing rating is not in valid_ratings are also
-    included.
+    When True, items whose existing rating is not in valid_ratings or whose
+    prefix does not match rating_prefix are also included.
 
     Returns a list of dicts: id, title, year, tmdb_id, imdb_id, tvdb_id.
     """
@@ -100,7 +117,8 @@ def get_items_needing_ratings(
     candidates = []
     for item in all_items:
         mpaa = item.get("mpaa", "")
-        if _needs_rating(mpaa, replace_incorrect, fallback_rating, valid_ratings):
+        if _needs_rating(mpaa, replace_incorrect, fallback_rating,
+                         valid_ratings, rating_prefix):
             uniqueid = item.get("uniqueid", {})
             candidates.append({
                 "id": item[media_type.kodi_id_field],

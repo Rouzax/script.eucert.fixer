@@ -95,7 +95,7 @@ def backfill(media_type: MediaType) -> Dict[str, int]:
     unresolved = load_tracker(media_type.tracker_filename)
 
     items = get_items_needing_ratings(
-        media_type, replace_incorrect, fallback_rating, valid_ratings,
+        media_type, replace_incorrect, fallback_rating, valid_ratings, prefix,
     )
     log.info("Scan starting", event="backfill.start",
              media_type=media_type.label, missing_count=len(items))
