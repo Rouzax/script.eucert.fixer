@@ -10,11 +10,11 @@ Kodi's TMDB scraper only fetches age ratings for one configured country. When th
 
 EU Certification Fixer runs in the background and periodically scans your library for items without ratings. It checks multiple sources in order:
 
-1. **TMDB direct** -- target country certification
-2. **TMDB inferred** -- mapped from culturally similar countries
-3. **OMDB** -- US MPAA rating mapped to your target scale
-4. **Country scrapers** -- FSK (Germany), BBFC (UK), Medieraadet (Denmark), Kijkwijzer.nl (Netherlands)
-5. **Fallback** -- a configurable default after a retry window expires
+1. **TMDB direct:** target country certification
+2. **TMDB inferred:** mapped from culturally similar countries
+3. **OMDB:** US MPAA rating mapped to your target scale
+4. **Country scrapers:** FSK (Germany), BBFC (UK), Medieraadet (Denmark), Kijkwijzer.nl (Netherlands)
+5. **Fallback:** a configurable default after a retry window expires
 
 Items that no source can resolve are tracked and retried on every scan. Only after the retry window expires (default: 30 days) is the fallback rating applied, giving time for new releases to get certifications added to TMDB.
 
