@@ -105,6 +105,7 @@ def seed_from_preset(country_code: str) -> None:
     """Write a fresh inference.json from the preset. Overwrites any existing file."""
     preset = load_preset(country_code)
     seed_data = {
+        "country_code": country_code,
         "inference_countries": preset["inference_countries"],
         "mappings": preset["mappings"],
     }
@@ -138,7 +139,22 @@ def load_inference_config(country_code: str) -> Dict[str, Any]:
 
     path = _get_config_path()
 
-    if not xbmcvfs.exists(path):
+    needs_seed = not xbmcvfs.exists(path)
+
+    if not needs_seed:
+        try:
+            with open(path, encoding="utf-8") as f:
+                data = json.load(f)
+            stored_country = data.get("country_code")
+            if not stored_country or stored_country != country_code:
+                log.info("Country changed, re-seeding config",
+                         event="config.reseed",
+                         old_country=stored_country, new_country=country_code)
+                needs_seed = True
+        except (json.JSONDecodeError, OSError):
+            needs_seed = True
+
+    if needs_seed:
         seed_from_preset(country_code)
         return {
             "country_code": country_code,
