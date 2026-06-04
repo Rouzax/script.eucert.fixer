@@ -91,7 +91,11 @@ def run() -> None:
             if monitor.has_pending_scan(LIBRARY_SCAN_DEBOUNCE_SEC):
                 should_scan = True
 
-            # Guard: don't scan while library is updating
+            # Guards: don't scan while library is updating or video is playing
+            if should_scan and xbmc.Player().isPlayingVideo():
+                should_scan = False
+                log.debug("Skipping scan, video is playing",
+                          event="service.skip_playback")
             if should_scan and not xbmc.getCondVisibility('Library.IsScanningVideo'):
                 total = _run_scan()
                 last_scan = time.time()

@@ -170,19 +170,19 @@ msgid "Fallback"
 msgstr ""
 
 msgctxt "#32121"
-msgid "Enable fallback rating"
+msgid "Apply certification when not found"
 msgstr ""
 
 msgctxt "#32122"
-msgid "Apply a default rating to items that no source can resolve after the retry window expires."
+msgid "Write a not-found certification to items that no source can resolve after the retry window expires."
 msgstr ""
 
 msgctxt "#32123"
-msgid "Fallback rating"
+msgid "Not-found certification"
 msgstr ""
 
 msgctxt "#32124"
-msgid "Rating to apply when no source can find a result and the retry window has expired."
+msgid "Value to write when no source can find a certification and the retry window has expired. NR means Not Rated."
 msgstr ""
 
 msgctxt "#32125"

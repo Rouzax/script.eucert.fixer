@@ -15,3 +15,25 @@
 /* Theme-aware logo: show dark text on light, white text on dark */
 [data-md-color-scheme="default"] .only-dark { display: none; }
 [data-md-color-scheme="slate"] .only-light { display: none; }
+
+/* Rating system logos on the rating-systems reference page */
+.rating-logo {
+  height: 36px !important;
+  max-height: 36px !important;
+  width: auto !important;
+  max-width: 200px;
+  vertical-align: middle;
+}
+
+/* Neutral background pill for logos (contrast in both themes) */
+.logo-badge {
+  display: inline-block;
+  padding: 6px 10px;
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.05);
+  line-height: 0;
+}
+
+[data-md-color-scheme="slate"] .logo-badge {
+  background: rgba(255, 255, 255, 0.85);
+}
