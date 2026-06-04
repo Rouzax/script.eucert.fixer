@@ -44,3 +44,9 @@ Once a rating is found, it is written back to your Kodi library and appears in t
 After the first scan completes, previously unrated items in your library will show a rating in their info screen. How many items are filled in depends on how many sources have data for your titles.
 
 See [Installation](installation.md) for detailed steps and what to expect after setup.
+
+---
+
+<img src="assets/tmdb-logo.svg" alt="TMDB" width="120">
+
+This product uses the TMDB API but is not endorsed or certified by [TMDB](https://www.themoviedb.org/).
