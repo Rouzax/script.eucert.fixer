@@ -79,5 +79,15 @@ TMDB_BASE_URL = "https://api.themoviedb.org/3"
 OMDB_BASE_URL = "https://www.omdbapi.com/"
 FSK_API_URL = "https://www.fsk.de/fskapi/ReleaseSearch"
 BBFC_SEARCH_URL = "https://www.bbfc.co.uk/search"
-KIJKWIJZER_SEARCH_URL = "https://www.kijkwijzer.nl/zoeken/"
 KIJKWIJZER_USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36"
+
+# =============================================================================
+# Scraper Canaries
+# =============================================================================
+
+SCRAPER_CANARIES = {
+    "fsk": {"title": "The Matrix", "expected": "16", "year": 1999},
+    "bbfc": {"title": "Interstellar", "expected": "12"},
+    "medieraadet": {"title": "Interstellar", "expected": "11", "year": 2014},
+    "kijkwijzer": {"title": "Interstellar", "expected": "12"},
+}

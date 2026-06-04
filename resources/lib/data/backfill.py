@@ -21,6 +21,7 @@ from resources.lib.constants import (
     DEFAULT_FALLBACK_RATING,
     DEFAULT_RATE_LIMIT_SEC,
     DEFAULT_RETRY_DAYS,
+    SCRAPER_CANARIES,
 )
 from resources.lib.config import load_inference_config
 from resources.lib.data.kodi import get_items_needing_ratings, update_rating
@@ -259,6 +260,64 @@ def _try_scrapers(
                       title=title, native=native, target=target)
 
     return None, None
+
+
+_SCRAPER_MODULES = {
+    "fsk": fsk,
+    "bbfc": bbfc,
+    "medieraadet": medieraadet,
+    "kijkwijzer": kijkwijzer,
+}
+
+
+def run_canaries(
+    use_fsk: bool,
+    use_bbfc: bool,
+    use_medieraadet: bool,
+    use_kijkwijzer: bool,
+    rate_limit: float,
+) -> None:
+    """Test each enabled scraper with a known title to detect breakage."""
+    enabled = {
+        "fsk": use_fsk,
+        "bbfc": use_bbfc,
+        "medieraadet": use_medieraadet,
+        "kijkwijzer": use_kijkwijzer,
+    }
+
+    for name, canary in SCRAPER_CANARIES.items():
+        if not enabled.get(name):
+            continue
+
+        module = _SCRAPER_MODULES.get(name)
+        if not module:
+            continue
+
+        title = canary["title"]
+        expected = canary["expected"]
+        kwargs = {"media_type_name": "movie"}
+        if "year" in canary:
+            kwargs["year"] = canary["year"]
+
+        try:
+            rating, _ = module.lookup(title, rate_limit, **kwargs)
+        except Exception:
+            log.warning("Canary request failed",
+                        event="scraper.canary_error", scraper=name, title=title)
+            time.sleep(rate_limit)
+            continue
+
+        if rating == expected:
+            log.debug("Canary passed", scraper=name, title=title, rating=rating)
+        elif rating is None:
+            log.warning("Canary returned no result; scraper may be broken",
+                        event="scraper.canary_fail",
+                        scraper=name, title=title, expected=expected)
+        else:
+            log.warning("Canary returned unexpected rating; scraper may have changed",
+                        event="scraper.canary_mismatch",
+                        scraper=name, title=title, expected=expected, got=rating)
+        time.sleep(rate_limit)
 
 
 def _stat_key(source: Optional[str]) -> str:
