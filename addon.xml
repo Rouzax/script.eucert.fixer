@@ -4,7 +4,7 @@
        version="0.3.0~alpha1"
        provider-name="Rouzax">
     <requires>
-        <import addon="xbmc.python" version="3.0.0" />
+        <import addon="xbmc.python" version="3.0.1" />
         <import addon="script.module.requests" version="2.28.0" />
     </requires>
     <extension point="xbmc.service"
@@ -17,17 +17,20 @@
     <extension point="xbmc.python.library"
                library="resources/lib" />
     <extension point="xbmc.addon.metadata">
-        <platform>all</platform>
-        <license>MIT</license>
         <summary lang="en_GB">Backfill missing age ratings in your Kodi library</summary>
         <description lang="en_GB">Automatically fills missing age certifications for movies and TV shows using TMDB, OMDB, and country-specific rating agencies. Supports 9 European and US rating systems. Runs in the background and checks periodically for items without certifications.</description>
-        <assets>
-            <icon>icon.png</icon>
-        </assets>
-        <news lang="en_GB">v0.3.0~alpha1
+        <language></language>
+        <platform>all</platform>
+        <license>MIT</license>
+        <website>https://rouzax.github.io/script.eucert.fixer/</website>
+        <source>https://github.com/Rouzax/script.eucert.fixer</source>
+        <news>v0.3.0~alpha1
 - Multi-country support with 9 presets (NL, BE, DE, AT, GB, US, FR, DK, SE)
 - FSK, BBFC, Medieraadet, and Kijkwijzer rating authority scrapers
 - Per-scraper enable/disable toggles
 - Renamed addon to EU Certification Fixer</news>
+        <assets>
+            <icon>icon.png</icon>
+        </assets>
     </extension>
 </addon>
