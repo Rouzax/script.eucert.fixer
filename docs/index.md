@@ -1,19 +1,4 @@
-<p align="center">
-  <img src="assets/kijkwijzer-logo-dark.svg" alt="Kijkwijzer" width="400" class="only-light">
-  <img src="assets/kijkwijzer-logo.svg" alt="Kijkwijzer" width="400" class="only-dark">
-</p>
-
 # EU Certification Fixer
-
-<p align="center">
-  <img src="assets/al.svg" alt="AL" width="40">
-  <img src="assets/6.svg" alt="6" width="40">
-  <img src="assets/9.svg" alt="9" width="40">
-  <img src="assets/12.svg" alt="12" width="40">
-  <img src="assets/14.svg" alt="14" width="40">
-  <img src="assets/16.svg" alt="16" width="40">
-  <img src="assets/18.svg" alt="18" width="40">
-</p>
 
 Automatically backfill missing age ratings for movies and TV shows in your Kodi library.
 
@@ -28,7 +13,7 @@ EU Certification Fixer runs in the background and periodically scans your librar
 1. **TMDB direct** -- target country certification
 2. **TMDB inferred** -- mapped from culturally similar countries
 3. **OMDB** -- US MPAA rating mapped to your target scale
-4. **Country scrapers** -- FSK (Germany), BBFC (UK), Kijkwijzer.nl (Netherlands)
+4. **Country scrapers** -- FSK (Germany), BBFC (UK), Medieraadet (Denmark), Kijkwijzer.nl (Netherlands)
 5. **Fallback** -- a configurable default after a retry window expires
 
 Items that no source can resolve are tracked and retried on every scan. Only after the retry window expires (default: 30 days) is the fallback rating applied, giving time for new releases to get certifications added to TMDB.

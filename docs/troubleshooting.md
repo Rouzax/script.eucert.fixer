@@ -32,9 +32,22 @@ The FSK provider searches by title and cross-references IMDB IDs from the respon
 
 The BBFC provider scrapes the bbfc.co.uk website. If the website changes its structure, lookups may stop returning results. Check the debug log for `[EUCert.bbfc]` entries. If the site structure changed, file an issue on GitHub.
 
+## Medieraadet lookups not working
+
+The Medieraadet provider uses a JSON API with an embedded key. If the key changes after a site redeployment, lookups will return no results. Check the debug log for `[EUCert.medieraadet]` entries. File an issue on GitHub if the API stops working.
+
 ## Kijkwijzer.nl lookups not working
 
-The Kijkwijzer.nl provider is disabled by default because the website uses bot protection (Akamai) that blocks automated requests. If you have a working connection to kijkwijzer.nl, you can enable it in the addon settings under Country scrapers.
+The Kijkwijzer provider uses an AJAX search endpoint with specific headers and a cookie. If the site is redesigned or the endpoint changes, lookups will stop working. Check the debug log for `[EUCert.kijkwijzer_provider]` entries. If you see "Challenge Validation" in the logged response, the bot protection is blocking requests.
+
+## Scraper canary warnings
+
+Each scan cycle tests the enabled scrapers with a known title to verify they are working. If a test fails, a warning is logged:
+
+- `scraper.canary_fail` means the scraper returned no result
+- `scraper.canary_mismatch` means it returned an unexpected rating
+
+These warnings indicate the scraper's website may have changed. Check for addon updates or file an issue on GitHub.
 
 ## Log file location
 

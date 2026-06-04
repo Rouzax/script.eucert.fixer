@@ -39,7 +39,8 @@ Each enabled scraper searches a national rating agency's website or API and retu
 |---------|---------|--------|-------|
 | **FSK** | Germany (DE) | REST API | Free, unauthenticated. Searches by title with IMDB ID cross-reference. Supports year filtering for disambiguation. |
 | **BBFC** | United Kingdom (GB) | Web scraping | Parses structured JSON from the BBFC website. Filters by Film or TV Show type. |
-| **Kijkwijzer** | Netherlands (NL) | Web scraping | Searches kijkwijzer.nl by title. Currently blocked by bot protection on most connections (disabled by default). |
+| **Medieraadet** | Denmark (DK) | JSON API | Free, unauthenticated. Searches by title with article stripping and year filtering. Cinema releases only, no TV series. |
+| **Kijkwijzer** | Netherlands (NL) | AJAX search API | Uses the site's AJAX search API. Returns ratings directly from search results. Handles inverted titles (e.g. "Matrix, The"). |
 
 If the scraper's native rating has no mapping to your target country, the result is discarded and the next scraper is tried.
 
@@ -64,8 +65,6 @@ Each country preset ships mapping tables for converting ratings from all other s
 - "Adult only" ratings always map to the target's maximum bracket
 - Intermediate ratings map to the nearest bracket in the target scale
 - When equidistant between two brackets, the stricter one is used (conservative rounding)
-
-Power users can edit the mapping tables in `addon_data/script.eucert.fixer/config/inference.json`. The valid ratings list always comes from the preset and cannot be overridden.
 
 ## Background service
 

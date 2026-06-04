@@ -6,17 +6,19 @@ New Features:
   - Country selection dropdown in settings
   - FSK provider: German rating agency REST API lookup
   - BBFC provider: British Board of Film Classification web scraper
+  - Medieraadet provider: Danish Media Council JSON API lookup
   - Per-scraper enable/disable toggles
 
 Improvements:
   - Country presets ship inference chains and cross-cultural rating mappings
   - Valid ratings determined dynamically from selected country preset
-  - Kijkwijzer.nl scraper disabled by default (Akamai blocking)
+  - Kijkwijzer.nl provider rewritten to use AJAX search API (bypasses Akamai)
 
 Internal:
   - config.py refactored to load from preset files
   - kodi.py _needs_rating() accepts dynamic valid_ratings parameter
   - backfill.py Tier 4 loops through enabled scrapers with native-to-target mapping
+  - Scraper canary checks verify provider health each scan cycle
 
 v0.1.0 (2026-xx-xx)
 - Initial release

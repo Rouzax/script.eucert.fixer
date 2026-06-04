@@ -17,7 +17,8 @@ These providers search national rating agency websites directly. Each returns th
 |---------|---------|-------------|
 | **Enable FSK lookup** | On | Search the German rating authority (fsk.de). Free API, no key required. |
 | **Enable BBFC lookup** | On | Search the British Board of Film Classification (bbfc.co.uk). Uses web scraping. |
-| **Enable Kijkwijzer lookup** | Off | Search the Dutch rating authority (kijkwijzer.nl). Currently blocked by bot protection on most connections. |
+| **Enable Medieraadet lookup** | On | Search the Danish Media Council (medieraadet.dk) for ratings. Free API, no key required. |
+| **Enable Kijkwijzer lookup** | On | Search the Dutch rating authority (kijkwijzer.nl). Uses the site's search API, which may break if the website changes. |
 
 ## Correction
 
