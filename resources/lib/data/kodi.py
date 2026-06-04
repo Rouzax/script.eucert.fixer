@@ -13,7 +13,7 @@ Logging:
 from __future__ import annotations
 
 import re
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 from resources.lib.constants import KNOWN_RATING_PREFIXES
 from resources.lib.data.media_types import MediaType
@@ -22,6 +22,15 @@ from resources.lib.utils import get_logger, json_query
 log = get_logger('data')
 
 _COUNTRY_PREFIX_RE = re.compile(r'^[A-Z]{2,3}:')
+
+_BOGUS_ID_VALUES = frozenset({"None", "none", "", "0", "null"})
+
+
+def _clean_id(value: Optional[str]) -> Optional[str]:
+    """Return None for missing or placeholder ID values from scrapers."""
+    if value is None or value in _BOGUS_ID_VALUES:
+        return None
+    return value
 
 
 def _strip_rating_prefix(mpaa: str) -> str:
@@ -97,9 +106,10 @@ def get_items_needing_ratings(
                 "id": item[media_type.kodi_id_field],
                 "title": item.get("title", ""),
                 "year": item.get("year", 0),
-                "tmdb_id": uniqueid.get("tmdb"),
-                "imdb_id": uniqueid.get("imdb"),
-                "tvdb_id": uniqueid.get("tvdb"),
+                "tmdb_id": _clean_id(uniqueid.get("tmdb")),
+                "imdb_id": _clean_id(uniqueid.get("imdb")),
+                "tvdb_id": _clean_id(uniqueid.get("tvdb")),
+                "tvmaze_id": _clean_id(uniqueid.get("tvmaze")),
             })
 
     log.debug("Items needing ratings",

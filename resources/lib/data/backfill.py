@@ -27,7 +27,7 @@ from resources.lib.config import load_inference_config
 from resources.lib.data.kodi import get_items_needing_ratings, update_rating
 from resources.lib.data.media_types import MediaType
 from resources.lib.data.tracker import load_tracker, save_tracker, should_apply_fallback
-from resources.lib.providers import tmdb, omdb, kijkwijzer, fsk, bbfc, medieraadet
+from resources.lib.providers import tmdb, omdb, kijkwijzer, fsk, bbfc, medieraadet, tvmaze
 from resources.lib.utils import (
     ApiKeyError, get_country_code, get_logger, get_setting, get_bool_setting,
     get_int_setting, get_float_setting, notify,
@@ -131,6 +131,16 @@ def backfill(media_type: MediaType) -> Dict[str, int]:
         source: Optional[str] = None
 
         try:
+            # Resolve TVmaze -> external IDs when no other IDs are available
+            tvmaze_id = item.get("tvmaze_id")
+            if tvmaze_id and not tmdb_id and not imdb_id and not tvdb_id:
+                maze_imdb, maze_tvdb = tvmaze.resolve_externals(tvmaze_id)
+                if maze_imdb:
+                    imdb_id = maze_imdb
+                if maze_tvdb:
+                    tvdb_id = maze_tvdb
+                time.sleep(rate_limit)
+
             if not tmdb_id and tmdb_key and tmdb_valid:
                 tmdb_id = tmdb.resolve_id(tmdb_key, tvdb_id=tvdb_id, imdb_id=imdb_id)
                 if tmdb_id:

@@ -32,6 +32,9 @@ pytest.ini
 # Build output
 build/
 
+# Docker integration tests
+docker/
+
 # Temp
 _temp/
 .worktrees/
