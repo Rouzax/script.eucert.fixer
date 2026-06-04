@@ -43,7 +43,7 @@ See [Rating Systems](rating-systems.md) for what each certification means and ho
 3. Select your country from the dropdown.
 4. Close settings. The addon begins scanning your library in the background.
 
-After the first scan completes, previously uncertified items in your library will show a certification in their info screen. How many items are filled in depends on how many sources have data for your titles.
+After the first scan completes, previously uncertified items in your library will show a certification in their info screen. How many items are filled in depends on how many sources have data for your titles. To scan immediately without waiting for the schedule, go to **Programs** > **Add-ons** > **EU Certification Fixer**.
 
 See [Installation](installation.md) for detailed steps and what to expect after setup.
 

@@ -24,13 +24,14 @@ jobs:
           python-version: "3.12"
       - uses: actions/configure-pages@v5
       - run: pip install mkdocs-material
-      - name: Build MkDocs
+      - name: Build MkDocs and assemble site
         run: |
           mkdocs build -d build/docs
-          touch build/docs/.nojekyll
+          cp -r site/* build/
+          touch build/.nojekyll
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: build/docs/
+          path: build/
 
   deploy:
     needs: build

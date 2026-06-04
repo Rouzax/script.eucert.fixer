@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EU Certification Fixer: Set it and forget it.</title>
+    <meta name="description" content="Kodi addon that automatically fills missing age certifications for movies and TV shows. Supports 9 European and US rating systems.">
+    <link rel="icon" type="image/png" href="images/icon.png">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="site-header">
+    <div class="header-inner">
+        <a href="./" class="wordmark">
+            <img src="images/icon.png" alt="EU Certification Fixer icon" class="wordmark-icon" width="32" height="32">
+            <span>EU Certification Fixer</span>
+        </a>
+        <nav>
+            <a href="https://github.com/Rouzax/script.eucert.fixer" target="_blank" rel="noopener noreferrer">GitHub</a>
+            <a href="docs/">Documentation</a>
+        </nav>
+    </div>
+</header>
+
+<main>
+
+    <section class="hero">
+        <div class="hero-inner">
+            <h1>Set it and forget it.</h1>
+            <p>EU Certification Fixer runs quietly in the background, filling in missing age certifications for every movie and TV show in your Kodi library. Configure it once, and your entire library gets certified.</p>
+            <div class="hero-buttons">
+                <a href="https://github.com/Rouzax/script.eucert.fixer/releases/latest" class="btn btn-primary">Download Latest Release</a>
+                <a href="docs/" class="btn btn-secondary">Documentation</a>
+                <a href="https://github.com/Rouzax/script.eucert.fixer" class="btn btn-secondary">View on GitHub</a>
+            </div>
+            <div class="hero-visual">
+                <div class="pipeline">
+                    <div class="pipeline-step">
+                        <div class="step-icon">1</div>
+                        <div class="step-text">
+                            <strong>TMDB Direct</strong>
+                            <span>Your country's certification</span>
+                        </div>
+                    </div>
+                    <div class="pipeline-arrow"></div>
+                    <div class="pipeline-step">
+                        <div class="step-icon">2</div>
+                        <div class="step-text">
+                            <strong>TMDB Inferred</strong>
+                            <span>Similar country, converted</span>
+                        </div>
+                    </div>
+                    <div class="pipeline-arrow"></div>
+                    <div class="pipeline-step">
+                        <div class="step-icon">3</div>
+                        <div class="step-text">
+                            <strong>OMDB</strong>
+                            <span>US MPAA, mapped to your scale</span>
+                        </div>
+                    </div>
+                    <div class="pipeline-arrow"></div>
+                    <div class="pipeline-step">
+                        <div class="step-icon">4</div>
+                        <div class="step-text">
+                            <strong>National Scrapers</strong>
+                            <span>FSK, BBFC, Medieraadet, Kijkwijzer</span>
+                        </div>
+                    </div>
+                    <div class="pipeline-arrow"></div>
+                    <div class="pipeline-step step-final">
+                        <div class="step-icon">&#10003;</div>
+                        <div class="step-text">
+                            <strong>Rating Applied</strong>
+                            <span>Written back to your library</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="features">
+        <div class="section-inner">
+            <h2>Key Features</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <h3>9 Country Presets</h3>
+                    <p>Netherlands, Belgium, Germany, Austria, United Kingdom, United States, France, Denmark, and Sweden. Each with full rating scale and conversion tables.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>4 National Scrapers</h3>
+                    <p>Searches FSK, BBFC, Medieraadet, and Kijkwijzer websites directly when TMDB and OMDB come up empty.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>Smart Conversion</h3>
+                    <p>Converts between rating systems using conservative rounding. Borderline cases always map to the stricter bracket.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>Background Operation</h3>
+                    <p>Runs as a Kodi service with configurable scan intervals and rate limiting. No manual intervention needed after setup.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>Retry Tracking</h3>
+                    <p>Items without a result are retried on every scan. After a configurable timeout, a fallback certification is applied.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>Replace Mode</h3>
+                    <p>Optionally re-certify items that already have a rating, useful when switching countries or fixing mismatched scraper settings.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="countries">
+        <div class="section-inner">
+            <h2>Supported Countries</h2>
+            <div class="countries-grid">
+                <div class="country-card">
+                    <span class="country-flag">&#127475;&#127473;</span>
+                    <strong>Netherlands</strong>
+                    <span class="country-system">Kijkwijzer</span>
+                    <span class="country-ratings">AL, 6, 9, 12, 14, 16, 18</span>
+                </div>
+                <div class="country-card">
+                    <span class="country-flag">&#127463;&#127466;</span>
+                    <strong>Belgium</strong>
+                    <span class="country-system">Kijkwijzer</span>
+                    <span class="country-ratings">AL, 6, 9, 12, 14, 16, 18</span>
+                </div>
+                <div class="country-card">
+                    <span class="country-flag">&#127465;&#127466;</span>
+                    <strong>Germany</strong>
+                    <span class="country-system">FSK</span>
+                    <span class="country-ratings">0, 6, 12, 16, 18</span>
+                </div>
+                <div class="country-card">
+                    <span class="country-flag">&#127462;&#127481;</span>
+                    <strong>Austria</strong>
+                    <span class="country-system">JMK</span>
+                    <span class="country-ratings">AA, 6, 8, 10, 12, 14, 16</span>
+                </div>
+                <div class="country-card">
+                    <span class="country-flag">&#127468;&#127463;</span>
+                    <strong>United Kingdom</strong>
+                    <span class="country-system">BBFC</span>
+                    <span class="country-ratings">U, PG, 12, 12A, 15, 18, R18</span>
+                </div>
+                <div class="country-card">
+                    <span class="country-flag">&#127482;&#127480;</span>
+                    <strong>United States</strong>
+                    <span class="country-system">MPAA</span>
+                    <span class="country-ratings">G, PG, PG-13, R, NC-17</span>
+                </div>
+                <div class="country-card">
+                    <span class="country-flag">&#127467;&#127479;</span>
+                    <strong>France</strong>
+                    <span class="country-system">CNC</span>
+                    <span class="country-ratings">TP, U, 10, 12, 16, 18</span>
+                </div>
+                <div class="country-card">
+                    <span class="country-flag">&#127465;&#127472;</span>
+                    <strong>Denmark</strong>
+                    <span class="country-system">Medieraadet</span>
+                    <span class="country-ratings">A, 7, 11, 15, F</span>
+                </div>
+                <div class="country-card">
+                    <span class="country-flag">&#127480;&#127466;</span>
+                    <strong>Sweden</strong>
+                    <span class="country-system">Mediemyndigheten</span>
+                    <span class="country-ratings">Btl, 7, 11, 15</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="getting-started">
+        <div class="section-inner">
+            <h2>Get Started in 4 Steps</h2>
+            <div class="steps-list">
+                <div class="start-step">
+                    <div class="start-number">1</div>
+                    <div class="start-text">
+                        <strong>Install the addon</strong>
+                        <p>From the <a href="https://github.com/Rouzax/repository.rouzax/releases" target="_blank" rel="noopener noreferrer">Rouzax Repository</a> or download from <a href="https://github.com/Rouzax/script.eucert.fixer/releases" target="_blank" rel="noopener noreferrer">GitHub Releases</a>.</p>
+                    </div>
+                </div>
+                <div class="start-step">
+                    <div class="start-number">2</div>
+                    <div class="start-text">
+                        <strong>Enter your TMDB API key</strong>
+                        <p>Free to obtain at <a href="https://www.themoviedb.org/settings/api" target="_blank" rel="noopener noreferrer">themoviedb.org</a>.</p>
+                    </div>
+                </div>
+                <div class="start-step">
+                    <div class="start-number">3</div>
+                    <div class="start-text">
+                        <strong>Select your country</strong>
+                        <p>Pick from 9 presets. The addon loads the right rating scale and conversion tables.</p>
+                    </div>
+                </div>
+                <div class="start-step">
+                    <div class="start-number">4</div>
+                    <div class="start-text">
+                        <strong>Close settings</strong>
+                        <p>The addon starts scanning your library. Previously uncertified items get their ratings filled in automatically.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+</main>
+
+<footer class="site-footer">
+    <div class="footer-inner">
+        <nav class="footer-links">
+            <a href="https://github.com/Rouzax/script.eucert.fixer" target="_blank" rel="noopener noreferrer">GitHub</a>
+            <a href="docs/">Documentation</a>
+            <a href="https://github.com/Rouzax/script.eucert.fixer/releases" target="_blank" rel="noopener noreferrer">Releases</a>
+        </nav>
+        <p class="footer-author">Created by Rouzax</p>
+        <p class="footer-meta">Licensed under MIT | Built for Kodi 21+</p>
+    </div>
+</footer>
+
+</body>
+</html>
