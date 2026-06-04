@@ -157,11 +157,19 @@ msgid "Select your country's certification system. This determines which certifi
 msgstr ""
 
 msgctxt "#32113"
-msgid "Certification prefix"
+msgid "Custom prefix"
 msgstr ""
 
 msgctxt "#32114"
-msgid "Text prepended to the certification value when writing to the library. Leave empty to use the default for your country (e.g. NL: for the Netherlands). Should match the format used by your Kodi info provider."
+msgid "Text prepended to the certification value instead of the country default. Should match the format used by your Kodi info provider."
+msgstr ""
+
+msgctxt "#32115"
+msgid "Override certification prefix"
+msgstr ""
+
+msgctxt "#32116"
+msgid "Use a custom prefix instead of the default for your country (e.g. NL: for the Netherlands, Rated for the US)."
 msgstr ""
 
 # Group: Fallback

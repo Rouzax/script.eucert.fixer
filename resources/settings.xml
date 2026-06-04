@@ -75,9 +75,17 @@
                     </constraints>
                     <control type="spinner" format="string" />
                 </setting>
+                <setting id="override_prefix" type="boolean" label="32115" help="32116">
+                    <level>2</level>
+                    <default>false</default>
+                    <control type="toggle" />
+                </setting>
                 <setting id="rating_prefix" type="string" label="32113" help="32114">
                     <level>2</level>
                     <default></default>
+                    <dependencies>
+                        <dependency type="visible" setting="override_prefix">true</dependency>
+                    </dependencies>
                     <constraints>
                         <allowempty>true</allowempty>
                     </constraints>

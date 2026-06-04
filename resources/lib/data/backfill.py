@@ -79,7 +79,10 @@ def backfill(media_type: MediaType) -> Dict[str, int]:
     inference_countries = config["inference_countries"]
     mappings = config["mappings"]
     target = config["country_code"]
-    prefix = get_setting('rating_prefix') or config.get("default_prefix", "")
+    if get_bool_setting('override_prefix'):
+        prefix = get_setting('rating_prefix')
+    else:
+        prefix = config.get("default_prefix", "")
 
     enable_fallback = get_bool_setting('enable_fallback')
     fallback_rating = ""
