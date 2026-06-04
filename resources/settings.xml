@@ -40,8 +40,8 @@
                     <control type="toggle" />
                 </setting>
                 <setting id="enable_kijkwijzer" type="boolean" label="32031" help="32032">
-                    <level>1</level>
-                    <default>false</default>
+                    <level>0</level>
+                    <default>true</default>
                     <control type="toggle" />
                 </setting>
             </group>

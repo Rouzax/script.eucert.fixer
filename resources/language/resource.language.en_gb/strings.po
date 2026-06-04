@@ -53,7 +53,7 @@ msgid "Enable Kijkwijzer lookup"
 msgstr ""
 
 msgctxt "#32032"
-msgid "Search the Dutch rating authority website (kijkwijzer.nl). Uses web scraping, which may break if the website changes. Currently blocked by bot protection on most connections."
+msgid "Search the Dutch rating authority website (kijkwijzer.nl). Uses the site's search API, which may break if the website changes."
 msgstr ""
 
 # Group: Correction
