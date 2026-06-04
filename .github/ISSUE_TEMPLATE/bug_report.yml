@@ -1,12 +1,12 @@
 name: Bug Report
-description: Report a bug or unexpected behavior in Kijkwijzer Ratings
+description: Report a bug or unexpected behavior in EU Certification Fixer
 labels: ["bug"]
 body:
   - type: input
     id: addon-version
     attributes:
       label: Addon version
-      description: Add-ons, then My Add-ons, then Kijkwijzer Ratings
+      description: Add-ons, then My Add-ons, then EU Certification Fixer
       placeholder: e.g. 0.1.0
     validations:
       required: true
@@ -60,7 +60,7 @@ body:
       description: |
         1. Settings > Advanced > enable "Enable debug logging"
         2. Reproduce the issue
-        3. Attach `Kodi/userdata/addon_data/script.kijkwijzer.ratings/logs/kijkwijzer.log` or paste the relevant section below
+        3. Attach `Kodi/userdata/addon_data/script.eucert.fixer/logs/eucert.log` or paste the relevant section below
       render: text
     validations:
       required: false

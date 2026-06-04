@@ -1,9 +1,9 @@
 """
-Kijkwijzer Ratings background service.
+EU Certification Fixer background service.
 
 Runs automatically when Kodi starts. Periodically scans the library
 for movies and TV shows with missing age ratings and fills them using
-TMDB, OMDB, and kijkwijzer.nl.
+TMDB, OMDB, and country-specific rating agencies.
 
 Logging:
     Logger: 'service'

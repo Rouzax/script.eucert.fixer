@@ -1,5 +1,5 @@
 """
-Shared utilities for Kijkwijzer Ratings addon.
+Shared utilities for EU Certification Fixer addon.
 
 Logging:
     This module contains the StructuredLogger implementation used by all
@@ -83,6 +83,15 @@ def get_float_setting(setting_id: str, default: float = 0.0) -> float:
 def lang(string_id: int) -> str:
     """Get localized string."""
     return get_addon().getLocalizedString(string_id)
+
+
+def get_country_code() -> str:
+    """Get the selected country code from the settings dropdown."""
+    from resources.lib.constants import COUNTRY_CODES, DEFAULT_COUNTRY_CODE
+    index = get_int_setting('country', 0)
+    if 0 <= index < len(COUNTRY_CODES):
+        return COUNTRY_CODES[index]
+    return DEFAULT_COUNTRY_CODE
 
 
 class ApiKeyError(Exception):

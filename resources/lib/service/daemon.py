@@ -1,5 +1,5 @@
 """
-Background service daemon for Kijkwijzer Ratings.
+Background service daemon for EU Certification Fixer.
 
 Runs a periodic scan loop that checks for missing ratings and fills them.
 Respects Kodi abort requests for clean shutdown.
@@ -35,7 +35,7 @@ from resources.lib.data.media_types import MOVIE, TVSHOW
 log = get_logger('service')
 
 
-class KijkwijzerMonitor(xbmc.Monitor):
+class CertMonitor(xbmc.Monitor):
     """Monitor subclass that tracks library scan/clean events."""
 
     def __init__(self) -> None:
@@ -70,7 +70,7 @@ class KijkwijzerMonitor(xbmc.Monitor):
 
 def run() -> None:
     """Main service entry point. Blocks until Kodi requests abort."""
-    monitor = KijkwijzerMonitor()
+    monitor = CertMonitor()
 
     log.info("Service started", event="service.start")
 
@@ -122,7 +122,7 @@ def _run_scan() -> int:
                     stats.get("tmdb_direct", 0) +
                     stats.get("tmdb_inferred", 0) +
                     stats.get("omdb", 0) +
-                    stats.get("kijkwijzer", 0) +
+                    stats.get("scraper", 0) +
                     stats.get("fallback", 0)
                 )
                 total_set += count

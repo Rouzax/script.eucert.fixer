@@ -1,5 +1,5 @@
 name: Feature Request
-description: Suggest a new feature or improvement for Kijkwijzer Ratings
+description: Suggest a new feature or improvement for EU Certification Fixer
 labels: ["enhancement"]
 body:
   - type: textarea

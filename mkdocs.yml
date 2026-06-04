@@ -1,8 +1,8 @@
-site_name: Kijkwijzer Ratings
-site_url: https://rouzax.github.io/script.kijkwijzer.ratings/docs/
-site_description: "Kijkwijzer Ratings, automatic age rating backfill for your Kodi library"
-repo_url: https://github.com/Rouzax/script.kijkwijzer.ratings
-repo_name: Rouzax/script.kijkwijzer.ratings
+site_name: EU Certification Fixer
+site_url: https://rouzax.github.io/script.eucert.fixer/docs/
+site_description: "EU Certification Fixer, automatic age rating backfill for your Kodi library"
+repo_url: https://github.com/Rouzax/script.eucert.fixer
+repo_name: Rouzax/script.eucert.fixer
 edit_uri: edit/main/docs/
 
 site_dir: build/docs

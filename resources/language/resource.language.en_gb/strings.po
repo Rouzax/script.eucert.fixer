@@ -1,9 +1,9 @@
-# Kijkwijzer Ratings language file
-# Addon id: script.kijkwijzer.ratings
+# EU Certification Fixer language file
+# Addon id: script.eucert.fixer
 msgid ""
 msgstr ""
-"Project-Id-Version: script.kijkwijzer.ratings\n"
-"Report-Msgid-Bugs-To: https://github.com/Rouzax/script.kijkwijzer.ratings\n"
+"Project-Id-Version: script.eucert.fixer\n"
+"Report-Msgid-Bugs-To: https://github.com/Rouzax/script.eucert.fixer\n"
 "PO-Revision-Date: 2026-06-03 00:00+0000\n"
 "Last-Translator: Rouzax\n"
 "Language-Team: English\n"
@@ -14,7 +14,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 # =============================================================================
-# Section: Providers (32001-32049)
+# Section: Providers (32001-32069)
 # =============================================================================
 
 msgctxt "#32001"
@@ -47,17 +47,13 @@ msgctxt "#32022"
 msgid "API key for the Open Movie Database (omdbapi.com). Used as a fallback when TMDB has no rating."
 msgstr ""
 
-# Group: Kijkwijzer.nl
-msgctxt "#32030"
-msgid "Kijkwijzer.nl"
-msgstr ""
-
+# Group: Kijkwijzer.nl (legacy IDs, now under Country scrapers group)
 msgctxt "#32031"
-msgid "Enable kijkwijzer.nl lookup"
+msgid "Enable Kijkwijzer lookup"
 msgstr ""
 
 msgctxt "#32032"
-msgid "Search the Dutch rating authority website (kijkwijzer.nl) when TMDB and OMDB have no result. Uses web scraping, which may break if the website changes its layout."
+msgid "Search the Dutch rating authority website (kijkwijzer.nl). Uses web scraping, which may break if the website changes. Currently blocked by bot protection on most connections."
 msgstr ""
 
 # Group: Correction
@@ -70,7 +66,65 @@ msgid "Replace incorrect ratings"
 msgstr ""
 
 msgctxt "#32042"
-msgid "Also replace existing ratings that are not valid Kijkwijzer values (e.g. US ratings like R or PG-13). When off, only items with no rating are processed."
+msgid "Also replace existing ratings that are not valid for your selected country (e.g. US ratings like R or PG-13 when your target is NL). When off, only items with no rating are processed."
+msgstr ""
+
+# Group: Country scrapers
+msgctxt "#32050"
+msgid "Country scrapers"
+msgstr ""
+
+msgctxt "#32051"
+msgid "Enable FSK lookup"
+msgstr ""
+
+msgctxt "#32052"
+msgid "Search the German rating authority (fsk.de) for ratings. Free API, no key required."
+msgstr ""
+
+msgctxt "#32053"
+msgid "Enable BBFC lookup"
+msgstr ""
+
+msgctxt "#32054"
+msgid "Search the British Board of Film Classification (bbfc.co.uk) for ratings. Uses web scraping."
+msgstr ""
+
+# Country dropdown options
+msgctxt "#32060"
+msgid "NL - Kijkwijzer"
+msgstr ""
+
+msgctxt "#32061"
+msgid "BE - Kijkwijzer"
+msgstr ""
+
+msgctxt "#32062"
+msgid "DE - FSK"
+msgstr ""
+
+msgctxt "#32063"
+msgid "AT - JMK"
+msgstr ""
+
+msgctxt "#32064"
+msgid "GB - BBFC"
+msgstr ""
+
+msgctxt "#32065"
+msgid "US - MPAA"
+msgstr ""
+
+msgctxt "#32066"
+msgid "FR - CNC"
+msgstr ""
+
+msgctxt "#32067"
+msgid "DK - Medieradet"
+msgstr ""
+
+msgctxt "#32068"
+msgid "SE - Mediemyndigheten"
 msgstr ""
 
 # =============================================================================
@@ -87,11 +141,11 @@ msgid "Rating format"
 msgstr ""
 
 msgctxt "#32111"
-msgid "Target country"
+msgid "Country"
 msgstr ""
 
 msgctxt "#32112"
-msgid "ISO 3166-1 country code for the rating system to use (e.g. NL for Kijkwijzer)."
+msgid "Select your country's age rating system. This determines which ratings are considered valid and how ratings from other countries are mapped."
 msgstr ""
 
 msgctxt "#32113"
@@ -99,7 +153,7 @@ msgid "Rating prefix"
 msgstr ""
 
 msgctxt "#32114"
-msgid "Text prepended to the rating value when writing to the library. Must match your scraper format. For the TMDb scraper this is typically your country code followed by a colon (e.g. NL:)."
+msgid "Text prepended to the rating value when writing to the library. Leave empty to use the default for your country. Must match your scraper format (typically your country code followed by a colon, e.g. NL:)."
 msgstr ""
 
 # Group: Fallback

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="script.kijkwijzer.ratings"
-       name="Kijkwijzer Ratings"
-       version="0.2.0~alpha1"
+<addon id="script.eucert.fixer"
+       name="EU Certification Fixer"
+       version="0.3.0~alpha1"
        provider-name="Rouzax">
     <requires>
         <import addon="xbmc.python" version="3.0.0" />
@@ -16,6 +16,6 @@
         <platform>all</platform>
         <license>MIT</license>
         <summary lang="en_GB">Backfill missing age ratings in your Kodi library</summary>
-        <description lang="en_GB">Automatically fills missing age ratings (mpaa) for movies and TV shows using TMDB, OMDB, and kijkwijzer.nl. Runs in the background and checks periodically for items without ratings.</description>
+        <description lang="en_GB">Automatically fills missing age ratings (mpaa) for movies and TV shows using TMDB, OMDB, and country-specific rating agencies. Supports 9 European and US rating systems. Runs in the background and checks periodically for items without ratings.</description>
     </extension>
 </addon>

@@ -1,7 +1,7 @@
 """
 Kodi JSON-RPC communication for rating queries and updates.
 
-Uses xbmc.executeJSONRPC() for internal communication (no HTTP needed).
+Uses xbmc.executeJSONRPC() for internal communication (no network needed).
 
 Logging:
     Logger: 'data'
@@ -13,9 +13,9 @@ Logging:
 from __future__ import annotations
 
 import re
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Tuple
 
-from resources.lib.constants import KNOWN_RATING_PREFIXES, VALID_RATINGS
+from resources.lib.constants import KNOWN_RATING_PREFIXES
 from resources.lib.data.media_types import MediaType
 from resources.lib.utils import get_logger, json_query
 
@@ -37,14 +37,19 @@ def _strip_rating_prefix(mpaa: str) -> str:
     return mpaa
 
 
-def _needs_rating(mpaa: str, replace_incorrect: bool, fallback_rating: str) -> bool:
-    """Check whether an item's mpaa value needs a Kijkwijzer rating."""
+def _needs_rating(
+    mpaa: str,
+    replace_incorrect: bool,
+    fallback_rating: str,
+    valid_ratings: Tuple[str, ...] = (),
+) -> bool:
+    """Check whether an item's mpaa value needs a rating for the target system."""
     if not mpaa:
         return True
     if not replace_incorrect:
         return False
     bare = _strip_rating_prefix(mpaa)
-    if bare in VALID_RATINGS:
+    if bare in valid_ratings:
         return False
     if fallback_rating and bare == fallback_rating:
         return False
@@ -56,21 +61,22 @@ def get_items_needing_ratings(
     media_type: MediaType,
     replace_incorrect: bool = False,
     fallback_rating: str = "",
+    valid_ratings: Tuple[str, ...] = (),
 ) -> List[Dict[str, Any]]:
     """
-    Query Kodi library for items needing a Kijkwijzer rating.
+    Query Kodi library for items needing a rating.
 
     When replace_incorrect is False, only items with empty mpaa are returned.
-    When True, items with non-Kijkwijzer ratings (e.g. US ratings like R,
-    PG-13, TV-MA) are also included.
+    When True, items whose existing rating is not in valid_ratings are also
+    included.
 
-    Returns a list of dicts: id, title, tmdb_id, imdb_id, tvdb_id.
+    Returns a list of dicts: id, title, year, tmdb_id, imdb_id, tvdb_id.
     """
     query = {
         "jsonrpc": "2.0",
         "method": media_type.kodi_list_method,
         "params": {
-            "properties": ["mpaa", "uniqueid", "title"],
+            "properties": ["mpaa", "uniqueid", "title", "year"],
             "sort": {"method": "title"},
         },
         "id": 1,
@@ -85,11 +91,12 @@ def get_items_needing_ratings(
     candidates = []
     for item in all_items:
         mpaa = item.get("mpaa", "")
-        if _needs_rating(mpaa, replace_incorrect, fallback_rating):
+        if _needs_rating(mpaa, replace_incorrect, fallback_rating, valid_ratings):
             uniqueid = item.get("uniqueid", {})
             candidates.append({
                 "id": item[media_type.kodi_id_field],
                 "title": item.get("title", ""),
+                "year": item.get("year", 0),
                 "tmdb_id": uniqueid.get("tmdb"),
                 "imdb_id": uniqueid.get("imdb"),
                 "tvdb_id": uniqueid.get("tvdb"),

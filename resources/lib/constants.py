@@ -1,19 +1,19 @@
-"""Centralized constants for Kijkwijzer Ratings addon."""
+"""Centralized constants for EU Certification Fixer addon."""
 from __future__ import annotations
 
 # =============================================================================
 # Addon Identity
 # =============================================================================
 
-DEFAULT_ADDON_ID = "script.kijkwijzer.ratings"
-ADDON_PREFIX = "Kijkwijzer"
+DEFAULT_ADDON_ID = "script.eucert.fixer"
+ADDON_PREFIX = "EUCert"
 
 # =============================================================================
 # Logging
 # =============================================================================
 
 LOG_DIR_NAME = "logs"
-LOG_FILENAME = "kijkwijzer.log"
+LOG_FILENAME = "eucert.log"
 LOG_MAX_SIZE_BYTES = 512 * 1024  # 500KB per file
 LOG_MAX_ROTATED_FILES = 3
 LOG_TIMESTAMP_FORMAT = "%Y-%m-%d %H:%M:%S.%f"
@@ -45,13 +45,16 @@ LIBRARY_SCAN_DEBOUNCE_SEC = 60
 # Rating Defaults
 # =============================================================================
 
-DEFAULT_TARGET_COUNTRY = "NL"
-DEFAULT_RATING_PREFIX = "NL:"
 DEFAULT_FALLBACK_RATING = "NR"
-
-# Valid Kijkwijzer age ratings
-VALID_RATINGS = ("AL", "6", "9", "12", "14", "16", "18")
 KNOWN_RATING_PREFIXES = ("Rated ",)
+
+# =============================================================================
+# Country Presets
+# =============================================================================
+
+PRESETS_DIR = "presets"
+DEFAULT_COUNTRY_CODE = "NL"
+COUNTRY_CODES = ("NL", "BE", "DE", "AT", "GB", "US", "FR", "DK", "SE")
 
 # =============================================================================
 # Tracker
@@ -74,5 +77,7 @@ CONFIG_FILENAME = "inference.json"
 
 TMDB_BASE_URL = "https://api.themoviedb.org/3"
 OMDB_BASE_URL = "https://www.omdbapi.com/"
+FSK_API_URL = "https://www.fsk.de/fskapi/ReleaseSearch"
+BBFC_SEARCH_URL = "https://www.bbfc.co.uk/search"
 KIJKWIJZER_SEARCH_URL = "https://www.kijkwijzer.nl/zoeken/"
 KIJKWIJZER_USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36"

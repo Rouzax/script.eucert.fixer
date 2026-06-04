@@ -1,7 +1,7 @@
 """
-Kijkwijzer Ratings manual trigger.
+EU Certification Fixer manual trigger.
 
-Entry point for RunScript(script.kijkwijzer.ratings).
+Entry point for RunScript(script.eucert.fixer).
 Triggers an immediate rating scan outside the normal schedule.
 
 Logging:
@@ -28,7 +28,7 @@ def main() -> None:
 
     total = sum(
         s.get("tmdb_direct", 0) + s.get("tmdb_inferred", 0) +
-        s.get("omdb", 0) + s.get("kijkwijzer", 0) + s.get("fallback", 0)
+        s.get("omdb", 0) + s.get("scraper", 0) + s.get("fallback", 0)
         for s in stats.values()
     )
     log.info("Manual scan complete", event="manual.complete",

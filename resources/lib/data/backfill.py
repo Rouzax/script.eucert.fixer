@@ -2,7 +2,7 @@
 Backfill orchestration.
 
 Coordinates the multi-tier rating lookup for a single media type:
-overrides -> TMDB direct -> TMDB inferred -> OMDB -> kijkwijzer.nl -> fallback.
+TMDB direct -> TMDB inferred -> OMDB -> country scrapers -> fallback.
 
 Logging:
     Logger: 'backfill'
@@ -15,22 +15,20 @@ Logging:
 from __future__ import annotations
 
 import time
-from typing import Dict, Optional
+from typing import Dict, Optional, Tuple
 
 from resources.lib.constants import (
     DEFAULT_FALLBACK_RATING,
     DEFAULT_RATE_LIMIT_SEC,
     DEFAULT_RETRY_DAYS,
-    DEFAULT_TARGET_COUNTRY,
-    DEFAULT_RATING_PREFIX,
 )
 from resources.lib.config import load_inference_config
 from resources.lib.data.kodi import get_items_needing_ratings, update_rating
 from resources.lib.data.media_types import MediaType
 from resources.lib.data.tracker import load_tracker, save_tracker, should_apply_fallback
-from resources.lib.providers import tmdb, omdb, kijkwijzer
+from resources.lib.providers import tmdb, omdb, kijkwijzer, fsk, bbfc
 from resources.lib.utils import (
-    ApiKeyError, get_logger, get_setting, get_bool_setting,
+    ApiKeyError, get_country_code, get_logger, get_setting, get_bool_setting,
     get_int_setting, get_float_setting, notify,
 )
 
@@ -43,17 +41,22 @@ def backfill(media_type: MediaType) -> Dict[str, int]:
 
     Returns a stats dict with counts per source.
     """
-    # Read settings
     tmdb_key = get_setting('tmdb_api_key')
     if not tmdb_key:
         log.warning("TMDB API key not configured, skipping scan",
                     event="backfill.skip", media_type=media_type.label)
         return {"tmdb_direct": 0, "tmdb_inferred": 0, "omdb": 0,
-                "kijkwijzer": 0, "fallback": 0, "pending": 0, "error": 0}
+                "scraper": 0, "fallback": 0, "pending": 0, "error": 0}
 
     omdb_key = get_setting('omdb_api_key')
-    target = get_setting('target_country') or DEFAULT_TARGET_COUNTRY
-    prefix = get_setting('rating_prefix') or DEFAULT_RATING_PREFIX
+    country_code = get_country_code()
+    config = load_inference_config(country_code)
+    valid_ratings = tuple(config["valid_ratings"])
+    inference_countries = config["inference_countries"]
+    mappings = config["mappings"]
+    target = config["country_code"]
+    prefix = get_setting('rating_prefix') or config.get("default_prefix", "")
+
     enable_fallback = get_bool_setting('enable_fallback')
     fallback_rating = ""
     retry_days = DEFAULT_RETRY_DAYS
@@ -62,17 +65,16 @@ def backfill(media_type: MediaType) -> Dict[str, int]:
         fallback_rating = raw_fallback if raw_fallback else DEFAULT_FALLBACK_RATING
         retry_days = get_int_setting('retry_days', DEFAULT_RETRY_DAYS)
     rate_limit = get_float_setting('rate_limit', DEFAULT_RATE_LIMIT_SEC)
+    use_fsk = get_bool_setting('enable_fsk')
+    use_bbfc = get_bool_setting('enable_bbfc')
     use_kijkwijzer = get_bool_setting('enable_kijkwijzer')
     replace_incorrect = get_bool_setting('replace_incorrect')
-    inference_cfg = load_inference_config()
-    inference_countries = inference_cfg["inference_countries"]
-    mappings = inference_cfg["mappings"]
 
-    # Load tracker for this media type
     unresolved = load_tracker(media_type.tracker_filename)
 
-    # Query Kodi for items needing ratings
-    items = get_items_needing_ratings(media_type, replace_incorrect, fallback_rating)
+    items = get_items_needing_ratings(
+        media_type, replace_incorrect, fallback_rating, valid_ratings,
+    )
     log.info("Scan starting", event="backfill.start",
              media_type=media_type.label, missing_count=len(items))
 
@@ -80,7 +82,7 @@ def backfill(media_type: MediaType) -> Dict[str, int]:
         "tmdb_direct": 0,
         "tmdb_inferred": 0,
         "omdb": 0,
-        "kijkwijzer": 0,
+        "scraper": 0,
         "fallback": 0,
         "pending": 0,
         "error": 0,
@@ -93,6 +95,7 @@ def backfill(media_type: MediaType) -> Dict[str, int]:
     for item in items:
         item_id = item["id"]
         title = item["title"]
+        item_year = item.get("year", 0)
         tmdb_id = item["tmdb_id"]
         imdb_id = item["imdb_id"]
         tvdb_id = item["tvdb_id"]
@@ -106,7 +109,6 @@ def backfill(media_type: MediaType) -> Dict[str, int]:
         source: Optional[str] = None
 
         try:
-            # Resolve TMDB ID from TVDB/IMDB when missing
             if not tmdb_id and tmdb_key and tmdb_valid:
                 tmdb_id = tmdb.resolve_id(tmdb_key, tvdb_id=tvdb_id, imdb_id=imdb_id)
                 if tmdb_id:
@@ -125,9 +127,13 @@ def backfill(media_type: MediaType) -> Dict[str, int]:
                 rating, source = omdb.lookup(imdb_id, omdb_key, mappings)
                 time.sleep(rate_limit)
 
-            # Tier 4: Kijkwijzer.nl
-            if not rating and use_kijkwijzer:
-                rating, source = kijkwijzer.lookup(title, rate_limit)
+            # Tier 4: Country scrapers
+            if not rating:
+                rating, source = _try_scrapers(
+                    title, rate_limit, imdb_id, media_type.name,
+                    item_year, target, mappings,
+                    use_fsk, use_bbfc, use_kijkwijzer,
+                )
 
         except ApiKeyError as e:
             if e.provider == "tmdb":
@@ -178,12 +184,75 @@ def backfill(media_type: MediaType) -> Dict[str, int]:
     return stats
 
 
+def _map_native_rating(
+    native_rating: str,
+    scraper_country: str,
+    target: str,
+    mappings: Dict[str, Dict[str, str]],
+) -> Optional[str]:
+    """Map a scraper's native rating to the target country scale."""
+    if scraper_country == target:
+        return native_rating
+    table = mappings.get(scraper_country, {})
+    return table.get(native_rating)
+
+
+def _try_scrapers(
+    title: str,
+    rate_limit: float,
+    imdb_id: Optional[str],
+    media_type_name: str,
+    year: int,
+    target: str,
+    mappings: Dict[str, Dict[str, str]],
+    use_fsk: bool,
+    use_bbfc: bool,
+    use_kijkwijzer: bool,
+) -> Tuple[Optional[str], Optional[str]]:
+    """Try enabled country scrapers in order. Returns (mapped_rating, source) or (None, None)."""
+    if use_fsk:
+        native, src = fsk.lookup(
+            title, rate_limit, imdb_id=imdb_id,
+            media_type_name=media_type_name, year=year,
+        )
+        if native and src:
+            mapped = _map_native_rating(native, "DE", target, mappings)
+            if mapped:
+                return mapped, src
+            log.debug("No DE mapping for FSK rating",
+                      title=title, native=native, target=target)
+        time.sleep(rate_limit)
+
+    if use_bbfc:
+        native, src = bbfc.lookup(
+            title, rate_limit, media_type_name=media_type_name,
+        )
+        if native and src:
+            mapped = _map_native_rating(native, "GB", target, mappings)
+            if mapped:
+                return mapped, src
+            log.debug("No GB mapping for BBFC rating",
+                      title=title, native=native, target=target)
+        time.sleep(rate_limit)
+
+    if use_kijkwijzer:
+        native, src = kijkwijzer.lookup(title, rate_limit)
+        if native and src:
+            mapped = _map_native_rating(native, "NL", target, mappings)
+            if mapped:
+                return mapped, src
+            log.debug("No NL mapping for Kijkwijzer rating",
+                      title=title, native=native, target=target)
+
+    return None, None
+
+
 def _stat_key(source: Optional[str]) -> str:
     """Map a source label to a stats dict key."""
     if not source:
         return "error"
-    if source == "kijkwijzer":
-        return "kijkwijzer"
+    if source in ("kijkwijzer", "fsk", "bbfc"):
+        return "scraper"
     if "inferred" in source:
         return "tmdb_inferred"
     if source.startswith("tmdb"):

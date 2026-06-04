@@ -1,3 +1,23 @@
+v0.3.0~alpha1 (2026-xx-xx)
+--------------------------
+New Features:
+  - Renamed addon to EU Certification Fixer (script.eucert.fixer)
+  - Multi-country rating support with 9 presets (NL, BE, DE, AT, GB, US, FR, DK, SE)
+  - Country selection dropdown in settings
+  - FSK provider: German rating agency REST API lookup
+  - BBFC provider: British Board of Film Classification web scraper
+  - Per-scraper enable/disable toggles
+
+Improvements:
+  - Country presets ship inference chains and cross-cultural rating mappings
+  - Valid ratings determined dynamically from selected country preset
+  - Kijkwijzer.nl scraper disabled by default (Akamai blocking)
+
+Internal:
+  - config.py refactored to load from preset files
+  - kodi.py _needs_rating() accepts dynamic valid_ratings parameter
+  - backfill.py Tier 4 loops through enabled scrapers with native-to-target mapping
+
 v0.1.0 (2026-xx-xx)
 - Initial release
 - Background service with configurable scan interval

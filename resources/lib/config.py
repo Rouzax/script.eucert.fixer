@@ -1,16 +1,17 @@
 """
 Inference configuration loader.
 
-Manages the inference.json config file in addon_data. Ships with NL
-Kijkwijzer defaults baked in. On first run, writes the defaults to
-addon_data so power users can edit them.
+Manages the inference.json config file in addon_data. Loads defaults
+from country preset files shipped with the addon. On first run, seeds
+the user's config from the selected country preset.
 
 Logging:
     Logger: 'config'
     Key events:
+        - config.preset_loaded (DEBUG): Preset loaded from addon resources
         - config.created (INFO): Default config written to addon_data
         - config.loaded (DEBUG): Config loaded from addon_data
-        - config.error (WARNING): Failed to load, using defaults
+        - config.error (WARNING): Failed to load, using preset defaults
 """
 from __future__ import annotations
 
@@ -18,45 +19,65 @@ import json
 import os
 from typing import Any, Dict
 
-from resources.lib.constants import CONFIG_DIR, CONFIG_FILENAME, DEFAULT_ADDON_ID
+from resources.lib.constants import (
+    CONFIG_DIR, CONFIG_FILENAME, DEFAULT_ADDON_ID,
+    DEFAULT_COUNTRY_CODE, PRESETS_DIR,
+)
 from resources.lib.utils import get_addon, get_logger
 
 log = get_logger('config')
 
-DEFAULT_INFERENCE_COUNTRIES = ["BE", "DE", "AT", "FR", "GB", "DK", "SE", "US"]
 
-DEFAULT_RATING_MAPPINGS = {
-    "BE": {
-        "AL": "AL", "6": "6", "9": "9", "12": "12",
-        "14": "14", "16": "16", "18": "18",
-    },
-    "DE": {
-        "0": "AL", "6": "6", "12": "12", "16": "16", "18": "18",
-    },
-    "AT": {
-        "0": "AL", "6": "6", "10": "12", "12": "12",
-        "14": "14", "16": "16", "18": "18",
-    },
-    "FR": {
-        "U": "AL", "10": "12", "12": "12", "16": "16", "18": "18",
-    },
-    "GB": {
-        "U": "AL", "PG": "6", "12": "12", "12A": "12",
-        "15": "16", "18": "18", "R18": "18",
-    },
-    "DK": {
-        "A": "AL", "7": "6", "11": "12", "15": "16",
-    },
-    "SE": {
-        "Btl": "AL", "7": "6", "11": "12", "15": "16",
-    },
-    "US": {
-        "G": "AL", "PG": "6", "PG-13": "12",
-        "R": "16", "NC-17": "18",
-        "TV-Y": "AL", "TV-Y7": "6", "TV-G": "AL",
-        "TV-PG": "9", "TV-14": "14", "TV-MA": "16",
-    },
-}
+def _get_presets_dir() -> str:
+    """Get the path to the shipped preset files in the addon install dir."""
+    try:
+        addon_path = get_addon().getAddonInfo('path')
+    except RuntimeError:
+        addon_path = os.path.dirname(os.path.dirname(
+            os.path.dirname(os.path.abspath(__file__))
+        ))
+    return os.path.join(addon_path, "resources", PRESETS_DIR)
+
+
+def load_preset(country_code: str) -> Dict[str, Any]:
+    """
+    Load a country preset from the shipped preset files.
+
+    Falls back to the default country (NL) if the requested preset
+    is missing. Returns the full preset dict.
+    """
+    presets_dir = _get_presets_dir()
+    path = os.path.join(presets_dir, "{}.json".format(country_code))
+
+    if not os.path.isfile(path):
+        log.warning("Preset not found, falling back to default",
+                    event="config.error",
+                    country=country_code, fallback=DEFAULT_COUNTRY_CODE)
+        path = os.path.join(presets_dir, "{}.json".format(DEFAULT_COUNTRY_CODE))
+
+    try:
+        with open(path, encoding="utf-8") as f:
+            preset = json.load(f)
+        log.debug("Preset loaded", country=country_code, path=path)
+        return preset
+    except (json.JSONDecodeError, OSError) as e:
+        log.warning("Failed to load preset", event="config.error",
+                    country=country_code, error=str(e))
+        return _fallback_preset()
+
+
+def _fallback_preset() -> Dict[str, Any]:
+    """Minimal hardcoded fallback if no preset file can be read."""
+    return {
+        "country_code": DEFAULT_COUNTRY_CODE,
+        "country_name": "Netherlands",
+        "system_name": "Kijkwijzer",
+        "display_name": "NL - Kijkwijzer",
+        "valid_ratings": ["AL", "6", "9", "12", "14", "16", "18"],
+        "default_prefix": "NL:",
+        "inference_countries": ["BE", "DE", "AT", "FR", "GB", "DK", "SE", "US"],
+        "mappings": {},
+    }
 
 
 def _get_config_dir() -> str:
@@ -80,34 +101,52 @@ def _get_config_path() -> str:
     return os.path.join(_get_config_dir(), CONFIG_FILENAME)
 
 
-def _build_defaults() -> Dict[str, Any]:
-    return {
-        "inference_countries": list(DEFAULT_INFERENCE_COUNTRIES),
-        "mappings": {k: dict(v) for k, v in DEFAULT_RATING_MAPPINGS.items()},
+def seed_from_preset(country_code: str) -> None:
+    """Write a fresh inference.json from the preset. Overwrites any existing file."""
+    preset = load_preset(country_code)
+    seed_data = {
+        "inference_countries": preset["inference_countries"],
+        "mappings": preset["mappings"],
     }
+    path = _get_config_path()
+    try:
+        with open(path, "w", encoding="utf-8") as f:
+            json.dump(seed_data, f, indent=2, sort_keys=True)
+        log.info("Config seeded from preset", event="config.created",
+                 country=country_code, path=path)
+    except OSError as e:
+        log.warning("Failed to write config", event="config.error",
+                    error=str(e))
 
 
-def load_inference_config() -> Dict[str, Any]:
+def load_inference_config(country_code: str) -> Dict[str, Any]:
     """
-    Load inference config from addon_data.
+    Load inference config for a country.
 
-    Creates the default file on first run. Returns a dict with
-    'inference_countries' (list of str) and 'mappings' (dict).
+    Loads the preset first, then checks for a user-edited inference.json
+    in addon_data. If no user file exists, seeds one from the preset.
+
+    Returns a dict with: country_code, valid_ratings, default_prefix,
+    inference_countries, mappings. valid_ratings always comes from the
+    preset (not user-editable).
     """
     import xbmcvfs  # noqa: PLC0415 -- late import for testability
+
+    preset = load_preset(country_code)
+    valid_ratings = list(preset.get("valid_ratings", []))
+    default_prefix = str(preset.get("default_prefix", ""))
 
     path = _get_config_path()
 
     if not xbmcvfs.exists(path):
-        defaults = _build_defaults()
-        try:
-            with open(path, "w", encoding="utf-8") as f:
-                json.dump(defaults, f, indent=2, sort_keys=True)
-            log.info("Default config created", event="config.created", path=path)
-        except OSError as e:
-            log.warning("Failed to write default config", event="config.error",
-                        error=str(e))
-        return defaults
+        seed_from_preset(country_code)
+        return {
+            "country_code": country_code,
+            "valid_ratings": valid_ratings,
+            "default_prefix": default_prefix,
+            "inference_countries": list(preset.get("inference_countries", [])),
+            "mappings": dict(preset.get("mappings", {})),
+        }
 
     try:
         with open(path, encoding="utf-8") as f:
@@ -117,9 +156,15 @@ def load_inference_config() -> Dict[str, Any]:
         countries = data.get("inference_countries")
         mappings = data.get("mappings")
         if not isinstance(countries, list) or not isinstance(mappings, dict):
-            log.warning("Invalid config structure, using defaults",
+            log.warning("Invalid config structure, using preset defaults",
                         event="config.error")
-            return _build_defaults()
+            return {
+                "country_code": country_code,
+                "valid_ratings": valid_ratings,
+                "default_prefix": default_prefix,
+                "inference_countries": list(preset.get("inference_countries", [])),
+                "mappings": dict(preset.get("mappings", {})),
+            }
 
         norm_mappings: Dict[str, Dict[str, str]] = {}
         for country, table in mappings.items():
@@ -127,10 +172,19 @@ def load_inference_config() -> Dict[str, Any]:
                 norm_mappings[country] = {str(k): str(v) for k, v in table.items()}
 
         return {
+            "country_code": country_code,
+            "valid_ratings": valid_ratings,
+            "default_prefix": default_prefix,
             "inference_countries": [str(c) for c in countries],
             "mappings": norm_mappings,
         }
     except (json.JSONDecodeError, OSError) as e:
-        log.warning("Failed to load config, using defaults",
+        log.warning("Failed to load config, using preset defaults",
                     event="config.error", error=str(e))
-        return _build_defaults()
+        return {
+            "country_code": country_code,
+            "valid_ratings": valid_ratings,
+            "default_prefix": default_prefix,
+            "inference_countries": list(preset.get("inference_countries", [])),
+            "mappings": dict(preset.get("mappings", {})),
+        }
