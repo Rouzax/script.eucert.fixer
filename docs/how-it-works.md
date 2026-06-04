@@ -1,73 +1,49 @@
 # How It Works
 
-The addon resolves ratings to your selected country's scale. Each country preset defines valid ratings, an inference chain of culturally similar countries, and mapping tables to convert between scales.
+## When does the addon scan?
 
-## Lookup tiers
+The addon runs as a background service that starts automatically when Kodi boots. It scans your library on startup, after every library update, and on a repeating schedule (default: every 24 hours).
 
-When the addon finds an item with an empty rating, it checks sources in order. The first source to return a result wins.
+## What happens during a scan?
 
-### Tier 1: TMDB direct
+The addon fetches your full movie and TV show lists from Kodi and identifies items that have no age rating. For each unrated item, it searches several sources in order until one returns a result. As soon as a rating is found, it is written to your library. The item then shows a rating in its info screen.
 
-Queries TMDB for the target country's certification. For movies this uses the `/movie/{id}/release_dates` endpoint; for TV shows, `/tv/{id}/content_ratings`.
+Items that no source can resolve are remembered and retried on the next scan.
 
-### Tier 2: TMDB inferred
+## How the addon finds a rating
 
-When the target country has no certification on TMDB, the addon checks other countries ordered by cultural similarity and maps their rating to the target scale. Each country preset defines its own inference chain. For example, the NL preset checks:
+When the addon processes an unrated item, it works through the following steps:
 
-| Priority | Country | System |
-|----------|---------|--------|
-| 1 | Belgium (BE) | Kijkwijzer (same system as NL) |
-| 2 | Germany (DE) | FSK |
-| 3 | Austria (AT) | JMK |
-| 4 | France (FR) | CNC |
-| 5 | United Kingdom (GB) | BBFC |
-| 6 | Denmark (DK) | Medieradet |
-| 7 | Sweden (SE) | Mediemyndigheten |
-| 8 | United States (US) | MPAA |
+**Step 1: Check TMDB for your country's rating directly.**
+TMDB carries age certifications submitted by distributors in many countries. If your chosen country's rating is already there, the addon uses it.
 
-All mappings use conservative rounding (when a rating falls between two brackets, the stricter one is used).
+**Step 2: Check TMDB for a rating from a similar country and convert it.**
+If TMDB has no rating for your country, the addon checks whether TMDB has a rating from a list of culturally similar countries. If it finds one, it converts that rating to your country's scale. When a foreign rating falls between two values on your country's scale, the stricter of the two is used.
 
-### Tier 3: Country scrapers
+**Step 3: Search national rating authority websites.**
+The addon can search the German (FSK), British (BBFC), Danish (Medieraadet), and Dutch (Kijkwijzer) rating authority websites directly. Each enabled scraper searches for the title and returns a rating from that authority's own database. The result is then converted to your country's scale using the same conservative approach described above.
 
-Each enabled scraper searches a national rating agency's website or API and returns the agency's native rating. The rating is then mapped to your target country's scale using the preset's mapping tables. The scraper for your selected country runs first (no mapping needed), followed by the others.
+You can enable or disable each scraper in the addon settings. The scraper for your own country runs first, since its rating needs no conversion.
 
-| Scraper | Country | Method | Notes |
-|---------|---------|--------|-------|
-| **FSK** | Germany (DE) | REST API | Free, unauthenticated. Searches by title with IMDB ID cross-reference. Supports year filtering for disambiguation. |
-| **BBFC** | United Kingdom (GB) | Web scraping | Parses structured JSON from the BBFC website. Filters by Film or TV Show type. |
-| **Medieraadet** | Denmark (DK) | JSON API | Free, unauthenticated. Searches by title with article stripping and year filtering. Cinema releases only, no TV series. |
-| **Kijkwijzer** | Netherlands (NL) | AJAX search API | Uses the site's AJAX search API. Returns ratings directly from search results. Handles inverted titles (e.g. "Matrix, The"). |
+**Step 4: Check OMDB.**
+OMDB is an independent database that carries US MPAA ratings. The addon looks up the title by its IMDB ID and converts the US rating to your country's scale.
 
-If the scraper's native rating has no mapping to your target country, the result is discarded and the next scraper is tried.
+**Step 5: Apply a fallback after 30 days.**
+If none of the above steps found a result, the item is tracked internally. On every subsequent scan, the addon tries all the steps above again. After 30 days (configurable) without a result, the addon applies the fallback rating you have configured (default: `NR`). This delay gives time for new releases to receive certifications in TMDB before the addon gives up.
 
-### Tier 4: OMDB
+## What "converting" a rating means
 
-Queries the Open Movie Database by IMDB ID. The US MPAA "Rated" field is mapped to the target scale via the US mapping table in the preset.
+Each country uses its own age rating scale with its own age thresholds. When the addon converts a German FSK rating to a Dutch Kijkwijzer rating, for example, it compares the age thresholds and picks the nearest match. If a rating falls between two thresholds on the target scale, the stricter option is always chosen to avoid under-rating content.
 
-### Tier 5: Fallback
+## How the addon tracks unresolved items
 
-After all sources have been exhausted, the item enters the retry tracker. On each subsequent scan, all sources are tried again. Only after the configured retry window (default: 30 days) has passed without a result is the fallback rating applied.
-
-## Retry tracking
-
-Items that no source can resolve are tracked in JSON files stored in the addon's data directory:
+When no source returns a result for an item, the addon stores the item's title and the date it was first seen unrated. This information is saved in two files in the addon's data directory:
 
 - `trackers/unresolved_movies.json`
 - `trackers/unresolved_tvshows.json`
 
-Each entry records the date the item was first seen without a rating. On every scan, all sources are retried. This gives time for new releases to get certifications added to TMDB.
+These files are updated automatically. You do not need to edit them.
 
-## Cross-cultural mapping
+## What the addon does not do
 
-Each country preset ships mapping tables for converting ratings from all other supported countries. Mappings follow these principles:
-
-- "All ages" ratings always map to the target's "all ages" bracket
-- "Adult only" ratings always map to the target's maximum bracket
-- Intermediate ratings map to the nearest bracket in the target scale
-- When equidistant between two brackets, the stricter one is used (conservative rounding)
-
-## Background service
-
-The addon runs as a Kodi service that starts automatically when Kodi boots. It scans the library on startup, after library updates, and on a configurable interval (default: every 24 hours).
-
-The service respects Kodi's shutdown requests and stops cleanly when Kodi exits.
+The addon only fills in items that are missing a rating. It does not modify items that already have a rating unless you enable "Replace incorrect ratings" in the settings. It does not change any other metadata fields (title, artwork, description, etc.).

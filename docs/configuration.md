@@ -1,64 +1,95 @@
 # Configuration
 
-All settings are in the addon's settings dialog: **Add-ons** > **My Add-ons** > **EU Certification Fixer** > **Configure**.
+Open the addon settings at **Add-ons** > **My Add-ons** > **EU Certification Fixer** > **Configure**.
 
-## API Keys
+The settings are organized across three tabs: **Providers**, **Ratings**, and **General**.
 
-| Setting | Description |
-|---------|-------------|
-| **TMDB API key** | Required. Get one at [themoviedb.org/settings/api](https://www.themoviedb.org/settings/api). Used for direct and inferred rating lookups. |
-| **OMDB API key** | Optional but recommended. Get one at [omdbapi.com/apikey.aspx](https://www.omdbapi.com/apikey.aspx). Used as a fallback when TMDB has no rating. Free tier allows 1,000 requests/day. |
+---
 
-## Country Scrapers
+## Providers tab
 
-These providers search national rating agency websites directly. Each returns the agency's native rating, which is mapped to your target country's scale automatically.
+### API keys
 
-| Setting | Default | Description |
-|---------|---------|-------------|
-| **Enable FSK lookup** | On | Search the German rating authority (fsk.de). Free API, no key required. |
-| **Enable BBFC lookup** | On | Search the British Board of Film Classification (bbfc.co.uk). Uses web scraping. |
-| **Enable Medieraadet lookup** | On | Search the Danish Media Council (medieraadet.dk) for ratings. Free API, no key required. |
-| **Enable Kijkwijzer lookup** | On | Search the Dutch rating authority (kijkwijzer.nl). Uses the site's search API, which may break if the website changes. |
+**TMDB API key** (required)
 
-## Correction
+The addon needs a TMDB key to look up ratings. Without it, no scanning happens. Get a free key at [themoviedb.org/settings/api](https://www.themoviedb.org/settings/api).
 
-| Setting | Default | Description |
-|---------|---------|-------------|
-| **Replace incorrect ratings** | Off | Also replace existing ratings that are not valid for your selected country. When off, only items with no rating are processed. |
+**OMDB API key** (optional)
 
-## Ratings
+OMDB is a secondary source used when TMDB has no rating for a title. Without this key, the addon skips the OMDB step and goes straight to applying the fallback after the retry window expires. The free OMDB tier allows 1,000 requests per day. Most libraries will not exceed this. Get a key at [omdbapi.com/apikey.aspx](https://www.omdbapi.com/apikey.aspx).
 
-| Setting | Default | Description |
-|---------|---------|-------------|
-| **Country** | NL - Kijkwijzer | Select your country's age rating system. Determines which ratings are valid and how foreign ratings are mapped. |
-| **Rating prefix** | *(from preset)* | Text prepended to the rating value. Leave empty to use the default for your country. Must match your scraper's format. |
-| **Enable fallback rating** | On | Apply a default rating after the retry window expires. |
-| **Fallback rating** | `NR` | Rating to apply when no source can find a result and the retry window has expired. |
-| **Retry days** | `30` | Days to keep retrying before applying the fallback. New releases often get certifications added to TMDB after their initial release. |
+### Rating authority scrapers
 
-### Matching the rating prefix
+These settings control whether the addon searches national rating authority websites. Each scraper looks up ratings from a specific country's classification board and converts the result to your country's scale.
 
-The prefix must match what your Kodi scraper writes. To check:
+| Setting | Default | What it covers |
+|---------|---------|----------------|
+| **Enable FSK lookup** | On | German film ratings (fsk.de). Free, no key required. |
+| **Enable BBFC lookup** | On | British Board of Film Classification (bbfc.co.uk). |
+| **Enable Medieraadet lookup** | On | Danish Media Council (medieraadet.dk). Free, no key required. Cinema releases only; TV series are not covered. |
+| **Enable Kijkwijzer lookup** | On | Dutch rating authority (kijkwijzer.nl). May stop working if the website changes. |
 
-1. Find an item in your library that already has a rating
-2. Look at its Info screen; note the format (e.g., "NL:12" or "Rated PG-13")
-3. If it differs from the preset default, set the prefix accordingly in the advanced settings
+You do not need to enable all scrapers. If you only care about your own country's ratings and TMDB has good coverage for your library, you can disable scrapers you do not need.
 
-## Schedule
+Note that these scrapers depend on the structure of each website. If a site changes, the corresponding scraper may stop working until an addon update is released. See [Troubleshooting](troubleshooting.md) if a scraper produces unexpected results.
 
-| Setting | Default | Description |
-|---------|---------|-------------|
-| **Scan interval (hours)** | `24` | How often the background service checks for items with missing ratings. A scan also runs automatically after each library update. |
-| **API rate limit (seconds)** | `0.25` | Delay between external API calls. Increase if you hit rate limits. |
+### Correction
 
-## Notifications
+**Replace incorrect ratings** (default: off)
 
-| Setting | Default | Description |
-|---------|---------|-------------|
-| **Show notifications** | On | Show a Kodi notification after a scan completes with new ratings. |
+When this is off, the addon only processes items that have no rating at all. When you turn this on, the addon also replaces existing ratings that are not valid for your selected country, for example if your library was scraped with a different country setting in the past.
 
-## Debugging
+---
 
-| Setting | Default | Description |
-|---------|---------|-------------|
-| **Enable debug logging** | Off | Write detailed diagnostic information to a separate log file at `addon_data/script.eucert.fixer/logs/eucert.log`. |
+## Ratings tab
+
+**Country** (default: NL - Kijkwijzer)
+
+Select your country's age rating system. This controls which ratings are considered valid, how ratings from other countries are converted to your scale, and what format is written to your library.
+
+**Rating prefix** (default: set by the country preset)
+
+The prefix is a short text string prepended to the rating value before it is written to Kodi. For example, a prefix of `Rated ` combined with a rating of `12` produces `Rated 12` in your library.
+
+The default for each country matches what the official Kodi TMDB scraper writes. Change this only if your library was previously scraped with a custom format. To check the format your library uses, find an item that already has a rating and look at its info screen.
+
+**Enable fallback rating** (default: on)
+
+When on, the addon applies a configurable default rating to any item that has not been resolved after the retry window (see below). When off, items remain unrated indefinitely if no source has a result.
+
+**Fallback rating** (default: `NR`)
+
+The rating to apply when the retry window expires and no source has returned a result. `NR` means "not rated." You can set this to any valid rating for your country.
+
+**Retry days** (default: `30`)
+
+How many days the addon keeps trying before applying the fallback. New releases often do not have ratings on TMDB immediately. Keeping a longer retry window gives more time for ratings to be added.
+
+---
+
+## General tab
+
+**Scan interval (hours)** (default: `24`)
+
+How often the addon scans your library for unrated items. A scan also runs automatically when Kodi finishes a library update. The minimum is 1 hour; the maximum is 168 hours (7 days).
+
+**API rate limit (seconds)** (default: `0.25`)
+
+How long the addon waits between calls to external services. Increasing this reduces the risk of hitting rate limits on busy rating websites, but makes scans take longer.
+
+**Show notifications** (default: on)
+
+When on, Kodi displays a notification after a scan that found new ratings. The notification shows how many items were updated.
+
+**Enable debug logging** (default: off)
+
+When on, the addon writes detailed information about every step to a separate log file. This is useful when something is not working as expected. The log file is at:
+
+| Platform | Path |
+|----------|------|
+| Windows | `%APPDATA%\Kodi\userdata\addon_data\script.eucert.fixer\logs\eucert.log` |
+| Linux | `~/.kodi/userdata/addon_data/script.eucert.fixer/logs/eucert.log` |
+| macOS | `~/Library/Application Support/Kodi/userdata/addon_data/script.eucert.fixer/logs/eucert.log` |
+| LibreELEC | `/storage/.kodi/userdata/addon_data/script.eucert.fixer/logs/eucert.log` |
+
+See [Troubleshooting](troubleshooting.md) for guidance on reading the log.
