@@ -1,3 +1,10 @@
+v0.3.1 (2026-06-04)
+--------------------------
+Improvements:
+  - Certification prefix now defaults to the country preset value (e.g. NL: for Netherlands, Rated for US) instead of being empty
+  - Added "Override certification prefix" toggle (advanced setting) to use a custom prefix
+  - The prefix text field only appears when the override toggle is enabled
+
 v0.3.0 (2026-06-04)
 --------------------------
   - Initial release
