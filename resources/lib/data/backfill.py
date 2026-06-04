@@ -97,6 +97,15 @@ def backfill(media_type: MediaType) -> Dict[str, int]:
     items = get_items_needing_ratings(
         media_type, replace_incorrect, fallback_rating, valid_ratings, prefix,
     )
+
+    titles_needing_ratings = {item["title"] for item in items}
+    stale = [t for t in unresolved if t not in titles_needing_ratings]
+    for title in stale:
+        unresolved.pop(title)
+    if stale:
+        log.info("Pruned stale tracker entries", event="backfill.prune",
+                 media_type=media_type.label, count=len(stale))
+
     log.info("Scan starting", event="backfill.start",
              media_type=media_type.label, missing_count=len(items))
 
