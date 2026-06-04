@@ -171,20 +171,116 @@ a:hover {
     color: var(--accent-hover);
 }
 
-/* ── Hero banner ───────────────────────────────────────── */
+/* ── Hero card ─────────────────────────────────────────── */
 
-.hero-banner {
-    max-width: 960px;
+.hero-card {
+    max-width: 860px;
     margin: 0 auto;
+    display: flex;
+    align-items: flex-start;
+    gap: 2.5rem;
+    background-color: var(--bg-secondary);
+    border: 1px solid var(--border);
     border-radius: var(--radius);
-    overflow: hidden;
+    padding: 2.5rem;
     box-shadow: 0 8px 40px rgba(0, 0, 0, 0.5);
 }
 
-.hero-banner img {
-    width: 100%;
-    height: auto;
-    display: block;
+.hero-card-icon {
+    flex-shrink: 0;
+}
+
+.hero-card-icon img {
+    width: 180px;
+    height: 180px;
+    border-radius: var(--radius);
+}
+
+.hero-card-content {
+    text-align: left;
+    min-width: 0;
+}
+
+.hero-card-title {
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: var(--text-primary);
+    letter-spacing: -0.02em;
+    margin-bottom: 0.25rem;
+}
+
+.hero-card-tagline {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--accent);
+    margin-bottom: 0.75rem;
+}
+
+.hero-card-desc {
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    margin-bottom: 1rem;
+}
+
+.hero-card-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.pill {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 6px;
+    background-color: var(--bg-tertiary);
+    border: 1px solid var(--border);
+    color: var(--accent);
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.15s ease;
+}
+
+.pill:hover,
+.pill.active {
+    background-color: var(--accent);
+    color: #0F0F0F;
+    border-color: var(--accent);
+    transform: translateY(-1px);
+}
+
+.hero-card-detail {
+    min-height: 3.5rem;
+    padding: 0.75rem 1rem;
+    background-color: transparent;
+    border-radius: 6px;
+    border: 1px solid transparent;
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
+
+.hero-card-detail.visible {
+    background-color: var(--bg-tertiary);
+    border-color: var(--border);
+}
+
+.detail-system {
+    color: var(--accent);
+    font-weight: 600;
+}
+
+.detail-ratings {
+    font-family: "SF Mono", "Fira Code", "Fira Mono", Menlo, Consolas, monospace;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+
+.hero-card-sources {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
 }
 
 /* ── Sections (shared) ────────────────────────────────── */
@@ -405,32 +501,24 @@ a:hover {
         font-size: 1.75rem;
     }
 
-    .pipeline {
+    .hero-card {
         flex-direction: column;
-        align-items: stretch;
-        gap: 0;
-        padding: 1.5rem;
+        text-align: center;
+        gap: 1.5rem;
+        padding: 2rem 1.5rem;
     }
 
-    .pipeline-step {
-        padding: 0.75rem 0;
+    .hero-card-content {
+        text-align: center;
     }
 
-    .pipeline-arrow {
-        width: 2px;
-        height: 1rem;
-        margin: 0 auto;
+    .hero-card-pills {
+        justify-content: center;
     }
 
-    .pipeline-arrow::after {
-        right: 50%;
-        top: auto;
-        bottom: 0;
-        transform: translateX(50%);
-        border-left: 4px solid transparent;
-        border-right: 4px solid transparent;
-        border-top: 5px solid var(--border);
-        border-bottom: none;
+    .hero-card-icon img {
+        width: 140px;
+        height: 140px;
     }
 }
 

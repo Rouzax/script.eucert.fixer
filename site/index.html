@@ -34,9 +34,64 @@
                 <a href="docs/" class="btn btn-secondary">Documentation</a>
                 <a href="https://github.com/Rouzax/script.eucert.fixer" class="btn btn-secondary">View on GitHub</a>
             </div>
-            <div class="hero-banner">
-                <img src="images/social-preview.png" alt="EU Certification Fixer: 9 country presets, multiple data sources, built for Kodi 21+">
+            <div class="hero-card">
+                <div class="hero-card-icon">
+                    <img src="images/icon.png" alt="EU Certification Fixer" width="200" height="200">
+                </div>
+                <div class="hero-card-content">
+                    <div class="hero-card-title">EU Certification Fixer</div>
+                    <div class="hero-card-tagline">Set it and forget it.</div>
+                    <div class="hero-card-desc">Automatically fills missing age certifications for movies and TV shows in your Kodi library.</div>
+                    <div class="hero-card-pills">
+                        <span class="pill">NL</span>
+                        <span class="pill">BE</span>
+                        <span class="pill">DE</span>
+                        <span class="pill">AT</span>
+                        <span class="pill">GB</span>
+                        <span class="pill">US</span>
+                        <span class="pill">FR</span>
+                        <span class="pill">DK</span>
+                        <span class="pill">SE</span>
+                    </div>
+                    <div class="hero-card-detail" id="pill-detail"></div>
+                    <div class="hero-card-sources">TMDB &middot; OMDB &middot; FSK &middot; BBFC &middot; Medier&aring;det &middot; Kijkwijzer</div>
+                </div>
             </div>
+
+<script>
+(function() {
+    var data = {
+        NL: { name: "Netherlands", system: "Kijkwijzer", ratings: "AL, 6, 9, 12, 14, 16, 18" },
+        BE: { name: "Belgium", system: "Kijkwijzer", ratings: "AL, 6, 9, 12, 14, 16, 18" },
+        DE: { name: "Germany", system: "FSK", ratings: "0, 6, 12, 16, 18" },
+        AT: { name: "Austria", system: "JMK", ratings: "AA, 6, 8, 10, 12, 14, 16" },
+        GB: { name: "United Kingdom", system: "BBFC", ratings: "U, PG, 12, 12A, 15, 18, R18" },
+        US: { name: "United States", system: "MPAA", ratings: "G, PG, PG-13, R, NC-17" },
+        FR: { name: "France", system: "CNC", ratings: "TP, U, 10, 12, 16, 18" },
+        DK: { name: "Denmark", system: "Medierådet", ratings: "A, 7, 11, 15, F" },
+        SE: { name: "Sweden", system: "Mediemyndigheten", ratings: "Btl, 7, 11, 15" }
+    };
+    var detail = document.getElementById("pill-detail");
+    var pills = document.querySelectorAll(".pill");
+    pills.forEach(function(pill) {
+        pill.addEventListener("click", function() {
+            var code = this.textContent.trim();
+            var info = data[code];
+            if (!info) return;
+            var wasActive = this.classList.contains("active");
+            pills.forEach(function(p) { p.classList.remove("active"); });
+            if (wasActive) {
+                detail.innerHTML = "";
+                detail.classList.remove("visible");
+                return;
+            }
+            this.classList.add("active");
+            detail.innerHTML = "<strong>" + info.name + "</strong> <span class='detail-system'>" + info.system + "</span><br><span class='detail-ratings'>" + info.ratings + "</span>";
+            detail.classList.add("visible");
+        });
+    });
+})();
+</script>
         </div>
     </section>
 
