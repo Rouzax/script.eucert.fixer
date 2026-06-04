@@ -45,11 +45,20 @@ def _extract_imdb_ids(doc: Dict[str, Any]) -> List[str]:
 
 
 def _title_matches(doc: Dict[str, Any], title: str) -> bool:
-    """Check if a doc's title matches the search title (case-insensitive)."""
+    """Check if a doc's title matches the search title (case-insensitive).
+
+    For TV series, FSK lists individual episodes with titles like
+    "BREAKING BAD SEASON 1 - AND THE BAG'S IN THE RIVER". A prefix
+    match handles this.
+    """
     title_lower = title.lower()
-    main = doc.get("mainTitle", "")
-    original = doc.get("mainOriginalTitle", "")
-    return main.lower() == title_lower or original.lower() == title_lower
+    for field in ("mainTitle", "mainOriginalTitle"):
+        val = doc.get(field, "").lower()
+        if not val:
+            continue
+        if val == title_lower or val.startswith(title_lower + " "):
+            return True
+    return False
 
 
 def lookup(
