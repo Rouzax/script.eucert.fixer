@@ -228,7 +228,7 @@ def _try_scrapers(
 
     if use_bbfc:
         native, src = bbfc.lookup(
-            title, rate_limit, media_type_name=media_type_name,
+            title, rate_limit, media_type_name=media_type_name, year=year,
         )
         if native and src:
             mapped = _map_native_rating(native, "GB", target, mappings)

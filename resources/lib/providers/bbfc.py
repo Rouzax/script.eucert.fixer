@@ -78,14 +78,22 @@ def _media_type_filter(result: Dict[str, Any], media_type_name: str) -> bool:
     return "film" in result_type
 
 
+def _extract_year(title_with_year: str) -> int:
+    """Extract year from a BBFC title like 'The Matrix (1999)'."""
+    m = re.search(r'\((\d{4})\)\s*$', title_with_year)
+    return int(m.group(1)) if m else 0
+
+
 def lookup(
     title: str,
     rate_limit: float = 0.25,
     media_type_name: str = "movie",
+    year: int = 0,
 ) -> Tuple[Optional[str], Optional[str]]:
     """
     Search the BBFC website by title.
 
+    When year is provided, prefers results matching that year.
     Returns (classification, "bbfc") or (None, None).
     Classification values: 'U', 'PG', '12', '12A', '15', '18', 'R18'.
     """
@@ -115,6 +123,7 @@ def lookup(
 
     title_lower = title.lower()
 
+    best_match = None
     for result in results:
         if not _media_type_filter(result, media_type_name):
             continue
@@ -125,9 +134,22 @@ def lookup(
             continue
 
         classification = result.get("classification", "")
-        if classification in _VALID_CLASSIFICATIONS:
-            log.debug("Match found", title=title, classification=classification)
+        if classification not in _VALID_CLASSIFICATIONS:
+            continue
+
+        result_year = _extract_year(result_title)
+
+        if year > 0 and result_year > 0 and abs(result_year - year) <= 1:
+            log.debug("Match found (year confirmed)", title=title,
+                      classification=classification, year=result_year)
             return classification, "bbfc"
+
+        if best_match is None:
+            best_match = (classification, result_title)
+
+    if best_match:
+        log.debug("Match found", title=title, classification=best_match[0])
+        return best_match[0], "bbfc"
 
     log.debug("No title match", title=title, result_count=len(results))
     return None, None
