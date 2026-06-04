@@ -2,7 +2,7 @@
 Backfill orchestration.
 
 Coordinates the multi-tier rating lookup for a single media type:
-TMDB direct -> TMDB inferred -> OMDB -> country scrapers -> fallback.
+TMDB direct -> TMDB inferred -> country scrapers -> OMDB -> fallback.
 
 Logging:
     Logger: 'backfill'
@@ -15,7 +15,7 @@ Logging:
 from __future__ import annotations
 
 import time
-from typing import Dict, Optional, Tuple
+from typing import Dict, Optional, Set, Tuple
 
 from resources.lib.constants import (
     DEFAULT_FALLBACK_RATING,
@@ -34,6 +34,29 @@ from resources.lib.utils import (
 )
 
 log = get_logger('backfill')
+
+_SCRAPERS = [
+    ("fsk", fsk, "DE"),
+    ("bbfc", bbfc, "GB"),
+    ("medieraadet", medieraadet, "DK"),
+    ("kijkwijzer", kijkwijzer, "NL"),
+]
+
+_SCRAPER_MODULES = {name: module for name, module, _ in _SCRAPERS}
+
+
+def _build_enabled_scrapers() -> Set[str]:
+    """Read scraper toggle settings and return the set of enabled names."""
+    enabled = set()  # type: Set[str]
+    if get_bool_setting('enable_fsk'):
+        enabled.add("fsk")
+    if get_bool_setting('enable_bbfc'):
+        enabled.add("bbfc")
+    if get_bool_setting('enable_medieraadet'):
+        enabled.add("medieraadet")
+    if get_bool_setting('enable_kijkwijzer'):
+        enabled.add("kijkwijzer")
+    return enabled
 
 
 def backfill(media_type: MediaType) -> Dict[str, int]:
@@ -66,10 +89,7 @@ def backfill(media_type: MediaType) -> Dict[str, int]:
         fallback_rating = raw_fallback if raw_fallback else DEFAULT_FALLBACK_RATING
         retry_days = get_int_setting('retry_days', DEFAULT_RETRY_DAYS)
     rate_limit = get_float_setting('rate_limit', DEFAULT_RATE_LIMIT_SEC)
-    use_fsk = get_bool_setting('enable_fsk')
-    use_bbfc = get_bool_setting('enable_bbfc')
-    use_medieraadet = get_bool_setting('enable_medieraadet')
-    use_kijkwijzer = get_bool_setting('enable_kijkwijzer')
+    enabled_scrapers = _build_enabled_scrapers()
     replace_incorrect = get_bool_setting('replace_incorrect')
 
     unresolved = load_tracker(media_type.tracker_filename)
@@ -124,18 +144,17 @@ def backfill(media_type: MediaType) -> Dict[str, int]:
                 )
                 time.sleep(rate_limit)
 
-            # Tier 3: OMDB
-            if not rating and imdb_id and omdb_key and omdb_valid:
-                rating, source = omdb.lookup(imdb_id, omdb_key, mappings)
-                time.sleep(rate_limit)
-
-            # Tier 4: Country scrapers
+            # Tier 3: Country scrapers (native scraper for target country first)
             if not rating:
                 rating, source = _try_scrapers(
                     title, rate_limit, imdb_id, media_type.name,
-                    item_year, target, mappings,
-                    use_fsk, use_bbfc, use_medieraadet, use_kijkwijzer,
+                    item_year, target, mappings, enabled_scrapers,
                 )
+
+            # Tier 4: OMDB (US MPAA rating mapped to target)
+            if not rating and imdb_id and omdb_key and omdb_valid:
+                rating, source = omdb.lookup(imdb_id, omdb_key, mappings)
+                time.sleep(rate_limit)
 
         except ApiKeyError as e:
             if e.provider == "tmdb":
@@ -195,6 +214,8 @@ def _map_native_rating(
     """Map a scraper's native rating to the target country scale."""
     if scraper_country == target:
         return native_rating
+    if target == "BE" and scraper_country == "NL":
+        return native_rating
     table = mappings.get(scraper_country, {})
     return table.get(native_rating)
 
@@ -207,86 +228,38 @@ def _try_scrapers(
     year: int,
     target: str,
     mappings: Dict[str, Dict[str, str]],
-    use_fsk: bool,
-    use_bbfc: bool,
-    use_medieraadet: bool,
-    use_kijkwijzer: bool,
+    enabled_scrapers: Set[str],
 ) -> Tuple[Optional[str], Optional[str]]:
-    """Try enabled country scrapers in order. Returns (mapped_rating, source) or (None, None)."""
-    if use_fsk:
-        native, src = fsk.lookup(
-            title, rate_limit, imdb_id=imdb_id,
-            media_type_name=media_type_name, year=year,
-        )
-        if native and src:
-            mapped = _map_native_rating(native, "DE", target, mappings)
-            if mapped:
-                return mapped, src
-            log.debug("No DE mapping for FSK rating",
-                      title=title, native=native, target=target)
-        time.sleep(rate_limit)
+    """Try enabled country scrapers, native scraper for target country first."""
+    ordered = sorted(
+        _SCRAPERS,
+        key=lambda s: 0 if s[2] == target or (target == "BE" and s[2] == "NL") else 1,
+    )
 
-    if use_bbfc:
-        native, src = bbfc.lookup(
-            title, rate_limit, media_type_name=media_type_name, year=year,
-        )
-        if native and src:
-            mapped = _map_native_rating(native, "GB", target, mappings)
-            if mapped:
-                return mapped, src
-            log.debug("No GB mapping for BBFC rating",
-                      title=title, native=native, target=target)
-        time.sleep(rate_limit)
+    for name, module, country in ordered:
+        if name not in enabled_scrapers:
+            continue
 
-    if use_medieraadet:
-        native, src = medieraadet.lookup(
-            title, rate_limit, media_type_name=media_type_name, year=year,
-        )
-        if native and src:
-            mapped = _map_native_rating(native, "DK", target, mappings)
-            if mapped:
-                return mapped, src
-            log.debug("No DK mapping for Medieraadet rating",
-                      title=title, native=native, target=target)
-        time.sleep(rate_limit)
+        kwargs = {"media_type_name": media_type_name, "year": year}
+        if name == "fsk":
+            kwargs["imdb_id"] = imdb_id
 
-    if use_kijkwijzer:
-        native, src = kijkwijzer.lookup(title, rate_limit)
+        native, src = module.lookup(title, rate_limit, **kwargs)
         if native and src:
-            mapped = _map_native_rating(native, "NL", target, mappings)
+            mapped = _map_native_rating(native, country, target, mappings)
             if mapped:
                 return mapped, src
-            log.debug("No NL mapping for Kijkwijzer rating",
-                      title=title, native=native, target=target)
+            log.debug("No mapping for scraper rating",
+                      scraper=name, title=title, native=native, target=target)
+        time.sleep(rate_limit)
 
     return None, None
 
 
-_SCRAPER_MODULES = {
-    "fsk": fsk,
-    "bbfc": bbfc,
-    "medieraadet": medieraadet,
-    "kijkwijzer": kijkwijzer,
-}
-
-
-def run_canaries(
-    use_fsk: bool,
-    use_bbfc: bool,
-    use_medieraadet: bool,
-    use_kijkwijzer: bool,
-    rate_limit: float,
-) -> None:
+def run_canaries(enabled_scrapers: Set[str], rate_limit: float) -> None:
     """Test each enabled scraper with a known title to detect breakage."""
-    enabled = {
-        "fsk": use_fsk,
-        "bbfc": use_bbfc,
-        "medieraadet": use_medieraadet,
-        "kijkwijzer": use_kijkwijzer,
-    }
-
     for name, canary in SCRAPER_CANARIES.items():
-        if not enabled.get(name):
+        if name not in enabled_scrapers:
             continue
 
         module = _SCRAPER_MODULES.get(name)

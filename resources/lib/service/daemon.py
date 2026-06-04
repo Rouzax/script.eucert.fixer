@@ -28,7 +28,7 @@ from resources.lib.utils import (
     StructuredLogger, get_bool_setting, get_float_setting, get_logger, get_int_setting,
     log_timing, notify,
 )
-from resources.lib.data.backfill import backfill, run_canaries
+from resources.lib.data.backfill import backfill, run_canaries, _build_enabled_scrapers
 from resources.lib.data.media_types import MOVIE, TVSHOW
 
 
@@ -115,11 +115,8 @@ def _run_scan() -> int:
     try:
         with log_timing(log, "scan_cycle") as timer:
             run_canaries(
-                use_fsk=get_bool_setting('enable_fsk'),
-                use_bbfc=get_bool_setting('enable_bbfc'),
-                use_medieraadet=get_bool_setting('enable_medieraadet'),
-                use_kijkwijzer=get_bool_setting('enable_kijkwijzer'),
-                rate_limit=get_float_setting('rate_limit', 0.25),
+                _build_enabled_scrapers(),
+                get_float_setting('rate_limit', 0.25),
             )
             timer.mark("canaries")
 

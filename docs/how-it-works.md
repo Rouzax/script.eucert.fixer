@@ -27,13 +27,9 @@ When the target country has no certification on TMDB, the addon checks other cou
 
 All mappings use conservative rounding (when a rating falls between two brackets, the stricter one is used).
 
-### Tier 3: OMDB
+### Tier 3: Country scrapers
 
-Queries the Open Movie Database by IMDB ID. The US MPAA "Rated" field is mapped to the target scale via the US mapping table in the preset.
-
-### Tier 4: Country scrapers
-
-Each enabled scraper searches a national rating agency's website or API and returns the agency's native rating. The rating is then mapped to your target country's scale using the preset's mapping tables.
+Each enabled scraper searches a national rating agency's website or API and returns the agency's native rating. The rating is then mapped to your target country's scale using the preset's mapping tables. The scraper for your selected country runs first (no mapping needed), followed by the others.
 
 | Scraper | Country | Method | Notes |
 |---------|---------|--------|-------|
@@ -43,6 +39,10 @@ Each enabled scraper searches a national rating agency's website or API and retu
 | **Kijkwijzer** | Netherlands (NL) | AJAX search API | Uses the site's AJAX search API. Returns ratings directly from search results. Handles inverted titles (e.g. "Matrix, The"). |
 
 If the scraper's native rating has no mapping to your target country, the result is discarded and the next scraper is tried.
+
+### Tier 4: OMDB
+
+Queries the Open Movie Database by IMDB ID. The US MPAA "Rated" field is mapped to the target scale via the US mapping table in the preset.
 
 ### Tier 5: Fallback
 
