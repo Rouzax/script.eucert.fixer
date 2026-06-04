@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: script.eucert.fixer\n"
 "Report-Msgid-Bugs-To: https://github.com/Rouzax/script.eucert.fixer\n"
-"PO-Revision-Date: 2026-06-03 00:00+0000\n"
+"PO-Revision-Date: 2026-06-04 00:00+0000\n"
 "Last-Translator: Rouzax\n"
 "Language-Team: English\n"
 "Language: en_GB\n"
@@ -31,7 +31,7 @@ msgid "TMDB API key"
 msgstr ""
 
 msgctxt "#32012"
-msgid "API key for The Movie Database (themoviedb.org). Required for rating lookups."
+msgid "API key for The Movie Database (themoviedb.org). Required for certification lookups."
 msgstr ""
 
 # Group: OMDB
@@ -44,7 +44,7 @@ msgid "OMDB API key"
 msgstr ""
 
 msgctxt "#32022"
-msgid "API key for the Open Movie Database (omdbapi.com). Used as a fallback when TMDB has no rating."
+msgid "API key for the Open Movie Database (omdbapi.com). Checked after TMDB and country scrapers when neither has a result."
 msgstr ""
 
 # Group: Kijkwijzer.nl (legacy IDs, now under Country scrapers group)
@@ -53,7 +53,7 @@ msgid "Enable Kijkwijzer lookup"
 msgstr ""
 
 msgctxt "#32032"
-msgid "Search the Dutch rating authority website (kijkwijzer.nl). Uses the site's search API, which may break if the website changes."
+msgid "Search the Dutch classification authority (kijkwijzer.nl). May be blocked on some systems by the site's bot protection."
 msgstr ""
 
 # Group: Correction
@@ -62,11 +62,11 @@ msgid "Correction"
 msgstr ""
 
 msgctxt "#32041"
-msgid "Replace incorrect ratings"
+msgid "Replace incorrect certifications"
 msgstr ""
 
 msgctxt "#32042"
-msgid "Also replace existing ratings that are not valid for your selected country (e.g. US ratings like R or PG-13 when your target is NL). When off, only items with no rating are processed."
+msgid "Replace existing certifications that do not match your selected country. This includes certifications from other systems (e.g. US Rated R when your country is NL) and certifications with a different country prefix (e.g. NL:14 when your country is AT). When off, only items with no certification are processed."
 msgstr ""
 
 # Group: Country scrapers
@@ -79,7 +79,7 @@ msgid "Enable FSK lookup"
 msgstr ""
 
 msgctxt "#32052"
-msgid "Search the German rating authority (fsk.de) for ratings. Free API, no key required."
+msgid "Search the German classification authority (fsk.de) for certifications."
 msgstr ""
 
 msgctxt "#32053"
@@ -87,7 +87,7 @@ msgid "Enable BBFC lookup"
 msgstr ""
 
 msgctxt "#32054"
-msgid "Search the British Board of Film Classification (bbfc.co.uk) for ratings. Uses web scraping."
+msgid "Search the British Board of Film Classification (bbfc.co.uk) for certifications."
 msgstr ""
 
 msgctxt "#32055"
@@ -95,7 +95,7 @@ msgid "Enable Medieraadet lookup"
 msgstr ""
 
 msgctxt "#32056"
-msgid "Search the Danish Media Council (medieraadet.dk) for ratings. Free API, no key required."
+msgid "Search the Danish Media Council (medieraadet.dk) for certifications."
 msgstr ""
 
 # Country dropdown options
@@ -136,16 +136,16 @@ msgid "SE - Mediemyndigheten"
 msgstr ""
 
 # =============================================================================
-# Section: Ratings (32100-32149)
+# Section: Certifications (32100-32149)
 # =============================================================================
 
 msgctxt "#32100"
-msgid "Ratings"
+msgid "Certifications"
 msgstr ""
 
-# Group: Rating format
+# Group: Certification format
 msgctxt "#32110"
-msgid "Rating format"
+msgid "Certification format"
 msgstr ""
 
 msgctxt "#32111"
@@ -153,15 +153,15 @@ msgid "Country"
 msgstr ""
 
 msgctxt "#32112"
-msgid "Select your country's age rating system. This determines which ratings are considered valid and how ratings from other countries are mapped."
+msgid "Select your country's certification system. This determines which certifications are valid and how certifications from other countries are converted."
 msgstr ""
 
 msgctxt "#32113"
-msgid "Rating prefix"
+msgid "Certification prefix"
 msgstr ""
 
 msgctxt "#32114"
-msgid "Text prepended to the rating value when writing to the library. Leave empty to use the default for your country. Must match your scraper format (typically your country code followed by a colon, e.g. NL:)."
+msgid "Text prepended to the certification value when writing to the library. Leave empty to use the default for your country (e.g. NL: for the Netherlands). Should match the format used by your Kodi info provider."
 msgstr ""
 
 # Group: Fallback
@@ -186,11 +186,11 @@ msgid "Value to write when no source can find a certification and the retry wind
 msgstr ""
 
 msgctxt "#32125"
-msgid "Retry days"
+msgid "Retry window (days)"
 msgstr ""
 
 msgctxt "#32126"
-msgid "Number of days to keep retrying before applying the fallback rating. New releases often get certifications added later."
+msgid "Number of days to keep retrying before applying the not-found certification. New releases often get certifications added to TMDB later."
 msgstr ""
 
 # =============================================================================
@@ -211,7 +211,7 @@ msgid "Scan interval (hours)"
 msgstr ""
 
 msgctxt "#32212"
-msgid "How often to check the library for items needing ratings. A scan also runs automatically after each library update. If multiple Kodi instances share a database, only enable this addon on one instance to avoid duplicate API calls."
+msgid "How often to check the library for items needing certifications. A scan also runs automatically after each library update. If multiple Kodi instances share a database, only enable this addon on one instance to avoid duplicate lookups."
 msgstr ""
 
 msgctxt "#32213"
@@ -232,7 +232,7 @@ msgid "Show notifications"
 msgstr ""
 
 msgctxt "#32222"
-msgid "Show a Kodi notification after a scan completes with new ratings."
+msgid "Show a Kodi notification when a scan sets new certifications."
 msgstr ""
 
 # Group: Debugging
@@ -245,5 +245,5 @@ msgid "Enable debug logging"
 msgstr ""
 
 msgctxt "#32232"
-msgid "Write detailed diagnostic information to a separate log file."
+msgid "Write detailed diagnostic information to a log file in the addon's data folder (addon_data/script.eucert.fixer/logs/)."
 msgstr ""
