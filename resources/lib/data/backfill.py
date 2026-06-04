@@ -26,7 +26,7 @@ from resources.lib.config import load_inference_config
 from resources.lib.data.kodi import get_items_needing_ratings, update_rating
 from resources.lib.data.media_types import MediaType
 from resources.lib.data.tracker import load_tracker, save_tracker, should_apply_fallback
-from resources.lib.providers import tmdb, omdb, kijkwijzer, fsk, bbfc
+from resources.lib.providers import tmdb, omdb, kijkwijzer, fsk, bbfc, medieraadet
 from resources.lib.utils import (
     ApiKeyError, get_country_code, get_logger, get_setting, get_bool_setting,
     get_int_setting, get_float_setting, notify,
@@ -67,6 +67,7 @@ def backfill(media_type: MediaType) -> Dict[str, int]:
     rate_limit = get_float_setting('rate_limit', DEFAULT_RATE_LIMIT_SEC)
     use_fsk = get_bool_setting('enable_fsk')
     use_bbfc = get_bool_setting('enable_bbfc')
+    use_medieraadet = get_bool_setting('enable_medieraadet')
     use_kijkwijzer = get_bool_setting('enable_kijkwijzer')
     replace_incorrect = get_bool_setting('replace_incorrect')
 
@@ -132,7 +133,7 @@ def backfill(media_type: MediaType) -> Dict[str, int]:
                 rating, source = _try_scrapers(
                     title, rate_limit, imdb_id, media_type.name,
                     item_year, target, mappings,
-                    use_fsk, use_bbfc, use_kijkwijzer,
+                    use_fsk, use_bbfc, use_medieraadet, use_kijkwijzer,
                 )
 
         except ApiKeyError as e:
@@ -207,6 +208,7 @@ def _try_scrapers(
     mappings: Dict[str, Dict[str, str]],
     use_fsk: bool,
     use_bbfc: bool,
+    use_medieraadet: bool,
     use_kijkwijzer: bool,
 ) -> Tuple[Optional[str], Optional[str]]:
     """Try enabled country scrapers in order. Returns (mapped_rating, source) or (None, None)."""
@@ -235,6 +237,18 @@ def _try_scrapers(
                       title=title, native=native, target=target)
         time.sleep(rate_limit)
 
+    if use_medieraadet:
+        native, src = medieraadet.lookup(
+            title, rate_limit, media_type_name=media_type_name, year=year,
+        )
+        if native and src:
+            mapped = _map_native_rating(native, "DK", target, mappings)
+            if mapped:
+                return mapped, src
+            log.debug("No DK mapping for Medieraadet rating",
+                      title=title, native=native, target=target)
+        time.sleep(rate_limit)
+
     if use_kijkwijzer:
         native, src = kijkwijzer.lookup(title, rate_limit)
         if native and src:
@@ -251,7 +265,7 @@ def _stat_key(source: Optional[str]) -> str:
     """Map a source label to a stats dict key."""
     if not source:
         return "error"
-    if source in ("kijkwijzer", "fsk", "bbfc"):
+    if source in ("kijkwijzer", "fsk", "bbfc", "medieraadet"):
         return "scraper"
     if "inferred" in source:
         return "tmdb_inferred"

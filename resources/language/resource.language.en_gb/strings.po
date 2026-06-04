@@ -90,6 +90,14 @@ msgctxt "#32054"
 msgid "Search the British Board of Film Classification (bbfc.co.uk) for ratings. Uses web scraping."
 msgstr ""
 
+msgctxt "#32055"
+msgid "Enable Medieraadet lookup"
+msgstr ""
+
+msgctxt "#32056"
+msgid "Search the Danish Media Council (medieraadet.dk) for ratings. Free API, no key required."
+msgstr ""
+
 # Country dropdown options
 msgctxt "#32060"
 msgid "NL - Kijkwijzer"
