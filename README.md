@@ -19,9 +19,9 @@ The addon runs quietly in the background. It scans your library on startup and o
 | Step | Source | What it checks |
 |------|--------|----------------|
 | 1 | TMDB | Your country's certification directly |
-| 2 | TMDB | A similar country's certification, converted to your scale |
-| 3 | OMDB | US MPAA certification, converted to your scale |
-| 4 | National scrapers | FSK (DE), BBFC (GB), Medieraadet (DK), Kijkwijzer (NL) websites |
+| 2 | National scraper | Your country's rating authority (e.g. FSK for DE, BBFC for GB) |
+| 3 | Inference chain | Similar countries in order of cultural relevance; checks TMDB first, then the scraper for each country |
+| 4 | OMDB | US MPAA certification, converted to your scale |
 | 5 | Retry / fallback | Retries for 30 days, then applies a configurable fallback |
 
 When converting between rating systems, the addon always picks the stricter option for borderline cases.

@@ -13,8 +13,8 @@ EU Certification Fixer (the addon) runs quietly in the background, finds those i
 When the addon finds an item without a certification, it searches several sources in order until one returns a result:
 
 1. It checks TMDB for your chosen country's certification directly.
-2. If that is not available, it checks whether TMDB has a certification from a culturally similar country and converts it to your country's scale.
-3. It then searches national rating authority websites (FSK for Germany, BBFC for the UK, Medieraadet for Denmark, Kijkwijzer for the Netherlands) and converts the result to your scale.
+2. If your country has a supported national scraper (FSK, BBFC, Medieraadet, or Kijkwijzer), it searches that rating authority's website. This certification is authoritative and needs no conversion.
+3. It walks a list of culturally similar countries, from most to least relevant. For each country, it checks TMDB first. If TMDB has no certification for that country, it tries the scraper for that country instead. The result is converted to your scale.
 4. It checks OMDB, which carries US MPAA certifications, and converts those to your scale.
 5. If none of these return a result, the item is retried on every scan. After 30 days without a result, a configurable not-found certification is applied.
 

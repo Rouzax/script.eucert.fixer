@@ -37,12 +37,14 @@ Note that these scrapers depend on the structure of each website. If a site chan
 
 **Replace incorrect certifications** (default: off)
 
-When this is off, the addon only processes items that have no certification at all. When you turn this on, the addon also checks existing certifications and replaces them if they do not match your selected country. Specifically, the addon replaces a certification when:
+When this is off, the addon only processes items that have no certification at all. When you turn this on, the addon also checks existing certifications and replaces them if they do not match your selected country and prefix. Specifically, the addon replaces a certification when:
 
 - It has the wrong prefix (for example, `Rated PG-13` when your country expects `DE:` prefixed certifications).
+- It is missing the expected prefix (for example, bare `12` when your country uses the `NL:` prefix).
+- It has an unwanted prefix (for example, `NL:12` when you have set a blank prefix override).
 - The certification value is not valid for your country's system (for example, an MPAA certification like `R` when your country uses FSK).
 
-Certifications that already have the correct prefix and a valid value for your country are left untouched. The configured not-found certification (default: `NR`) is also preserved.
+Only certifications that match the expected format exactly (correct prefix and a valid value) are left untouched. The configured not-found certification (default: `NR`) is also preserved, but only when it has the correct prefix.
 
 This setting is useful when your library was previously scraped with a different country or prefix setting, or when your metadata scraper and the addon use different prefix formats. See the [installation guide](installation.md) for advice on matching your scraper settings.
 
