@@ -41,14 +41,14 @@ To reduce how quickly you reach the limit:
 
 ## Some titles are not found by scrapers
 
-Each scraper searches for a title by name. If the name in your Kodi library differs from the name used by the rating authority, the scraper may not find a match. Common causes:
+Each scraper searches for a title by name. The addon handles accented characters (for example, "Pokémon" matches "Pokemon"), common article inversions ("Matrix, The" matches "The Matrix"), and TV series with season suffixes ("Pokémon: XY" matches a search for "Pokémon"). If the name in your Kodi library still differs from the name used by the rating authority, the scraper may not find a match. Common causes:
 
-- **Title formatting differences.** Some databases store titles as "Matrix, The" instead of "The Matrix." The addon handles common inversions, but unusual formats may still fail.
-- **Year mismatches.** If the release year in your library metadata differs from the year the rating authority used (for example, cinema release versus home release), the scraper may skip the result.
+- **Completely different title.** Some titles are translated or localized. The addon searches using your Kodi library title, which may not match the name the rating authority uses.
+- **Year mismatches (movies).** For movies, the addon filters results by release year to avoid false matches on common titles. If the year in your library metadata differs from the year the rating authority used, the result may be skipped. TV shows are not year-filtered because rating authorities often classify seasons years after the original air date.
 - **New releases.** Title databases at rating authorities are not always up to date immediately after release.
 - **TV series.** The Danish Medieraadet scraper covers cinema releases only; TV series are not in its database.
 
-If a specific title is repeatedly not found, enable debug logging and check the log to see which scrapers were tried and what they returned. This may help identify whether the issue is a title mismatch or a scraper problem.
+If a specific title is repeatedly not found, enable debug logging and check the log to see which scrapers were tried, how many results they returned, and why none matched.
 
 ---
 
