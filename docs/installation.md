@@ -55,7 +55,7 @@ The addon starts its background service automatically when Kodi boots. The first
 
 ## What happens next
 
-The addon scans your entire library looking for movies and TV shows that have no age certification. For each one it finds, it searches TMDB, rating authority websites, and OMDB in turn. When it finds a certification, it writes it back to your library immediately.
+The addon scans your entire library looking for movies and TV shows that have no age certification. For each one it finds, it checks TMDB, your country's national rating authority, and then a series of culturally similar countries (checking both TMDB and their scrapers). As a last resort it checks OMDB. When it finds a certification, it writes it back to your library immediately.
 
 After the first scan finishes, open any previously uncertified movie or TV show and check its info screen. If the addon found a certification, it will now appear in the rating field. Items for which no source had a certification are retried on every scan and will be filled in once the information becomes available.
 
