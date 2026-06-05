@@ -58,28 +58,18 @@ def _needs_rating(
         return True
     if not replace_incorrect:
         return False
-    if rating_prefix and _has_wrong_prefix(mpaa, rating_prefix):
-        log.debug("Flagged for replacement (wrong prefix)",
-                  mpaa=mpaa, expected_prefix=rating_prefix)
-        return True
     bare = _strip_rating_prefix(mpaa)
+    expected = "{}{}".format(rating_prefix, bare)
+    if mpaa != expected:
+        log.debug("Flagged for replacement (wrong format)",
+                  mpaa=mpaa, expected=expected)
+        return True
     if bare in valid_ratings:
         return False
     if fallback_rating and bare == fallback_rating:
         return False
     log.debug("Flagged for replacement", mpaa=mpaa, stripped=bare)
     return True
-
-
-def _has_wrong_prefix(mpaa: str, expected_prefix: str) -> bool:
-    """Check if mpaa has a country or known prefix that differs from expected."""
-    match = _COUNTRY_PREFIX_RE.match(mpaa)
-    if match:
-        return mpaa[:match.end()] != expected_prefix
-    for prefix in KNOWN_RATING_PREFIXES:
-        if mpaa.startswith(prefix):
-            return prefix != expected_prefix
-    return False
 
 
 def get_items_needing_ratings(

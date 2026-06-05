@@ -1,3 +1,15 @@
+v0.3.2 (2026-06-05)
+--------------------------
+Improvements:
+  - Native scraper (FSK, BBFC, Medieraadet, Kijkwijzer) now runs before TMDB inference for your own country
+  - Inference chain walks countries by cultural relevance, checking TMDB then the scraper for each country before moving on
+  - Scrapers fill gaps where TMDB is missing certifications for culturally close countries
+
+Fixes:
+  - "Replace incorrect certifications" now enforces the configured prefix: items with the wrong prefix, a missing prefix, or an unwanted prefix are flagged and re-rated
+  - Blank prefix override correctly replaces prefixed values like "NL:12" with bare "12"
+  - "Rated NR" is now replaced when it does not match the expected prefix format
+
 v0.3.1 (2026-06-04)
 --------------------------
 Improvements:
