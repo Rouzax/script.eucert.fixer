@@ -45,6 +45,14 @@ The addon starts its background service automatically when Kodi boots. The first
 
     Note: Austria and Belgium are not available in the TMDB scraper's certification country dropdown. For those countries, this addon is the only way to get correct local certifications.
 
+!!! tip "Shared database setups"
+
+    If multiple Kodi devices share the same library database (MySQL/MariaDB), install this addon on only one device. All devices read from the same database, so certifications filled in by one device appear on all of them immediately.
+
+    Running the addon on multiple devices against the same library has no benefit and uses your API quota faster. OMDB's free tier is limited to 1,000 requests per day, and national rating authority websites have their own rate limits.
+
+    Pick the device that runs the most (for example, a headless server or your primary living room device) and install the addon there.
+
 ## What happens next
 
 The addon scans your entire library looking for movies and TV shows that have no age certification. For each one it finds, it searches TMDB, rating authority websites, and OMDB in turn. When it finds a certification, it writes it back to your library immediately.

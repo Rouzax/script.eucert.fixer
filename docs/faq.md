@@ -36,9 +36,9 @@ Common reasons a title is not found:
 
 Items that cannot be resolved are retried on every scan. After 30 days without a result, the not-found certification is applied.
 
-## Can I run the addon on multiple Kodi instances sharing a database?
+## I have multiple Kodi devices sharing a database. Do I install this on all of them?
 
-Yes, but enable the addon on only one instance. If two instances run the addon against the same library at the same time, they will make duplicate requests to external services and may overwrite each other's progress tracking.
+No. Install and enable the addon on only one device. All devices read from the same library database, so certifications filled in by one device appear on all of them immediately. Running the addon on multiple devices has no benefit and uses your API quota faster (OMDB's free tier allows only 1,000 requests per day). Pick the device that runs the most, such as a headless server or your primary living room device.
 
 ## How do I check what the addon is doing right now?
 
