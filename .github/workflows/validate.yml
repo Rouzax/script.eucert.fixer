@@ -41,4 +41,19 @@ jobs:
         run: python3 -m pytest tests/ -v
 
       - name: Kodi addon checker
-        run: kodi-addon-checker --branch omega .
+        run: |
+          mkdir -p /tmp/addon-check/script.eucert.fixer
+          rsync -a \
+            --exclude=tests --exclude=__pycache__ \
+            --exclude=.git --exclude=.github \
+            --exclude=docker --exclude=docs \
+            --exclude=build --exclude=site \
+            --exclude=_temp --exclude=.worktrees \
+            --exclude=.ruff_cache --exclude=.pytest_cache \
+            --exclude=CLAUDE.md --exclude=.claude \
+            --exclude=.claudeignore --exclude=.mcp.json \
+            --exclude=mkdocs.yml --exclude=pyrightconfig.json \
+            --exclude=.pyflakes --exclude=.gitignore \
+            --exclude=README.md --exclude=TODO.md --exclude=pytest.ini \
+            . /tmp/addon-check/script.eucert.fixer/
+          kodi-addon-checker --branch omega /tmp/addon-check
