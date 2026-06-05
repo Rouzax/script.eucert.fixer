@@ -121,10 +121,12 @@ def lookup(
         )
         if resp.status_code != 200:
             log.warning("Search returned unexpected status",
-                        event="kijkwijzer.error", status=resp.status_code)
+                        event="kijkwijzer.error", title=title,
+                        status=resp.status_code)
             return None, None
     except requests.RequestException as e:
-        log.warning("Search failed", event="kijkwijzer.error", error=str(e))
+        log.warning("Search failed", event="kijkwijzer.error",
+                    title=title, error=str(e))
         return None, None
 
     results = _parse_results(resp.text)
@@ -149,7 +151,8 @@ def lookup(
         rating = result["rating"]
         if rating and (rating == "AL" or rating in _VALID_RATINGS):
             log.debug("Match found", title=title,
-                      result_title=result["title"], rating=rating)
+                      result_title=result["title"], rating=rating,
+                      result_count=len(results))
             return rating, "kijkwijzer"
 
     log.debug("No title match", title=title, result_count=len(results))

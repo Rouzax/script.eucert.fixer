@@ -130,8 +130,9 @@ def lookup(
             if imdb_id in _extract_imdb_ids(doc):
                 rating = str(doc.get("__rating", ""))
                 if rating in ("0", "6", "12", "16", "18"):
-                    log.debug("IMDB match", title=title,
-                              imdb_id=imdb_id, rating=rating)
+                    log.debug("Match found", title=title,
+                              imdb_id=imdb_id, rating=rating,
+                              result_count=len(docs))
                     return rating, "fsk"
 
     # Fall back to title match
@@ -139,8 +140,9 @@ def lookup(
         if _title_matches(doc, title):
             rating = str(doc.get("__rating", ""))
             if rating in ("0", "6", "12", "16", "18"):
-                log.debug("Title match", title=title, rating=rating)
+                log.debug("Match found", title=title, rating=rating,
+                          result_count=len(docs))
                 return rating, "fsk"
 
-    log.debug("No matching doc", title=title, result_count=len(docs))
+    log.debug("No title match", title=title, result_count=len(docs))
     return None, None

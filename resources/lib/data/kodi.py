@@ -131,6 +131,7 @@ def update_rating(
     item_id: int,
     rating_value: str,
     media_type: MediaType,
+    title: str = "",
 ) -> bool:
     """
     Set the mpaa field for an item via JSON-RPC.
@@ -153,10 +154,10 @@ def update_rating(
     if success:
         log.info("Rating set", event="data.update",
                  media_type=media_type.name, item_id=item_id,
-                 rating=rating_value)
+                 title=title, rating=rating_value)
     else:
         log.warning("Failed to set rating", event="data.update_fail",
                     media_type=media_type.name, item_id=item_id,
-                    response=str(result))
+                    title=title, response=str(result))
 
     return success

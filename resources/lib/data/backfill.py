@@ -210,7 +210,7 @@ def backfill(media_type: MediaType) -> Dict[str, int]:
         if rating:
             unresolved.pop(title, None)
             full_rating = "{}{}".format(prefix, rating)
-            update_rating(item_id, full_rating, media_type)
+            update_rating(item_id, full_rating, media_type, title=title)
             log.info("Rating applied", event="backfill.rated",
                      media_type=media_type.label, title=title,
                      rating=full_rating, source=source)
@@ -218,7 +218,7 @@ def backfill(media_type: MediaType) -> Dict[str, int]:
 
         elif fallback_rating and should_apply_fallback(title, unresolved, retry_days):
             full_rating = "{}{}".format(prefix, fallback_rating)
-            update_rating(item_id, full_rating, media_type)
+            update_rating(item_id, full_rating, media_type, title=title)
             log.info("Fallback rating applied", event="backfill.rated",
                      media_type=media_type.label, title=title,
                      rating=full_rating, source="fallback")
@@ -227,7 +227,8 @@ def backfill(media_type: MediaType) -> Dict[str, int]:
 
         else:
             first_seen = unresolved.get(title, {}).get("first_seen", "today")
-            log.debug("Item pending", title=title, first_seen=first_seen)
+            log.debug("Item pending", media_type=media_type.label,
+                      title=title, first_seen=first_seen)
             stats["pending"] += 1
 
     save_tracker(media_type.tracker_filename, unresolved)
@@ -307,11 +308,11 @@ def _try_inference_chain(
             foreign_rating = tmdb_certs[uc]
             mapped = mappings.get(uc, {}).get(foreign_rating)
             if mapped:
-                log.debug("Inferred from TMDB", country=uc,
+                log.debug("Inferred from TMDB", title=title, country=uc,
                           foreign_rating=foreign_rating, mapped=mapped)
                 return mapped, "tmdb-inferred-{}".format(uc)
             log.debug("TMDB cert unmappable, skipping scraper too",
-                      country=uc, rating=foreign_rating)
+                      title=title, country=uc, rating=foreign_rating)
             continue
 
         entry = _SCRAPER_BY_COUNTRY.get(uc)

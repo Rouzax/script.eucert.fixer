@@ -140,15 +140,17 @@ def lookup(
         result_year = _extract_year(result_title)
 
         if year > 0 and result_year > 0 and abs(result_year - year) <= 1:
-            log.debug("Match found (year confirmed)", title=title,
-                      classification=classification, year=result_year)
+            log.debug("Match found", title=title,
+                      classification=classification, year=result_year,
+                      result_count=len(results))
             return classification, "bbfc"
 
         if best_match is None:
             best_match = (classification, result_title)
 
     if best_match:
-        log.debug("Match found", title=title, classification=best_match[0])
+        log.debug("Match found", title=title, classification=best_match[0],
+                  result_count=len(results))
         return best_match[0], "bbfc"
 
     log.debug("No title match", title=title, result_count=len(results))

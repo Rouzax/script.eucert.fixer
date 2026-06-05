@@ -59,7 +59,7 @@ def lookup(
         return None, None
 
     if data.get("Response") == "False":
-        log.debug("No result", imdb_id=imdb_id)
+        log.debug("No results", imdb_id=imdb_id)
         return None, None
 
     rated = data.get("Rated", "")
@@ -69,7 +69,7 @@ def lookup(
     us_mappings = mappings.get("US", {})
     mapped = us_mappings.get(rated)
     if mapped:
-        log.debug("Rating mapped", imdb_id=imdb_id,
+        log.debug("Match found", imdb_id=imdb_id,
                   us_rating=rated, mapped=mapped)
         return mapped, "omdb"
 

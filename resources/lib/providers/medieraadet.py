@@ -181,8 +181,9 @@ def lookup(
         if rating:
             log.debug("Match found", title=title,
                        film_title=detail.get("Title", ""),
-                       code=code, rating=rating)
+                       code=code, rating=rating,
+                       result_count=len(films))
             return rating, "medieraadet"
 
-    log.debug("No matching film", title=title, result_count=len(films))
+    log.debug("No title match", title=title, result_count=len(films))
     return None, None
