@@ -54,11 +54,13 @@ This setting is useful when your library was previously scraped with a different
 
 Select your country's age rating system. This controls which certifications are considered valid, how certifications from other countries are converted to your scale, and what format is written to your library.
 
-**Certification prefix** (default: set by the country preset)
+**Override certification prefix** (default: off, advanced setting)
 
-The prefix is a short text string prepended to the certification value before it is written to Kodi. For example, a prefix of `NL:` combined with a certification of `12` produces `NL:12` in your library.
+The certification prefix is a short text string prepended to the certification value before it is written to Kodi. For example, a prefix of `NL:` combined with a certification of `12` produces `NL:12` in your library.
 
-The default prefix is set by your selected country preset (for example, `NL:` for Netherlands, `DE:` for Germany, `Rated ` for the US). Changing the country in the dropdown does not automatically update the prefix. If you switch countries, clear this field or update it manually to match the new country's format.
+By default, the prefix is set automatically by your selected country preset (for example, `NL:` for Netherlands, `DE:` for Germany, `Rated ` for the US). Switching countries changes the prefix automatically.
+
+If you need a custom prefix, enable **Override certification prefix** in the advanced settings. A text field appears where you can type any prefix you want. Leave it empty to write certifications with no prefix at all.
 
 **Apply certification when not found** (default: on)
 

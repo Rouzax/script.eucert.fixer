@@ -11,8 +11,8 @@ The addon scans on startup and then on a schedule (default: every 24 hours). If 
 **Restart Kodi after installation.**
 If Kodi was already running when you installed the addon, the background service may not have started. Restart Kodi so the service starts fresh.
 
-**Check the rating prefix.**
-The prefix must match what your Kodi scraper already writes to the library. Find an item that already has a rating and check its format on the info screen (for example, `NL:12` or `Rated PG-13`). Compare this to the "Rating prefix" setting in the addon. If they do not match, any rating the addon writes will not display correctly.
+**Check the certification prefix.**
+The prefix must match what your Kodi scraper already writes to the library. Find an item that already has a certification and check its format on the info screen (for example, `NL:12` or `Rated PG-13`). By default the addon uses the prefix from your country preset. If your scraper uses a different format, enable **Override certification prefix** in the advanced settings and set it to match.
 
 **Enable debug logging.**
 In the addon settings under **General**, turn on debug logging. Then go to **Programs** > **Add-ons** > **EU Certification Fixer** to trigger a scan. Check the log file for details on what the addon found and did not find. See [Log file location](#log-file-location) below.
