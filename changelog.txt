@@ -1,3 +1,13 @@
+v0.3.3 (2026-06-05)
+--------------------------
+Improvements:
+  - Every per-item log line now includes title= for greppable debug logs
+  - Standardized provider outcome messages: "Match found", "No title match", "No results" across all scrapers
+  - All scraper match and no-match log lines now include result_count=
+  - Kijkwijzer warning logs now include title=
+  - Inference chain debug logs now include title=
+  - "Item pending" log now includes media_type=
+
 v0.3.2 (2026-06-05)
 --------------------------
 Improvements:
