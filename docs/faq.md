@@ -34,7 +34,7 @@ Common reasons a title is not found:
 - The OMDB free tier limit (1,000 requests/day) was reached during the scan.
 - A scraper is not working due to a website change. See [Troubleshooting](troubleshooting.md).
 
-Items that cannot be resolved are retried on every scan. After 30 days without a result, the not-found certification is applied.
+Items that cannot be resolved are retried on every scan. After 30 days without a result, the not-found certification is applied. If you believe the addon should have found a specific title, [report it on GitHub](https://github.com/Rouzax/script.eucert.fixer/issues/new) and include the relevant lines from the debug log.
 
 ## I have multiple Kodi devices sharing a database. Do I install this on all of them?
 

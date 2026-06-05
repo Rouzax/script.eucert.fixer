@@ -23,7 +23,7 @@ In the addon settings under **General**, turn on debug logging. Then go to **Pro
 
 The addon always picks the stricter of two options when converting a rating from one country's scale to another. A rating that seems too strict is the addon choosing the safer side of a borderline case. This is by design.
 
-If you see a rating that seems completely incorrect (not just stricter than expected), enable debug logging and check the log to see which source provided the rating and how it was converted.
+If you see a rating that seems completely incorrect (not just stricter than expected), enable debug logging and check the log to see which source provided the rating and how it was converted. If the mapping looks wrong, [report it on GitHub](https://github.com/Rouzax/script.eucert.fixer/issues/new) with the title, the rating that was applied, and the source shown in the log.
 
 ---
 
@@ -48,7 +48,7 @@ Each scraper searches for a title by name. The addon handles accented characters
 - **New releases.** Title databases at rating authorities are not always up to date immediately after release.
 - **TV series.** The Danish Medieraadet scraper covers cinema releases only; TV series are not in its database.
 
-If a specific title is repeatedly not found, enable debug logging and check the log to see which scrapers were tried, how many results they returned, and why none matched.
+If a specific title is repeatedly not found, enable debug logging and check the log to see which scrapers were tried, how many results they returned, and why none matched. If you believe the addon should have found the title, [report it on GitHub](https://github.com/Rouzax/script.eucert.fixer/issues/new) and include the relevant lines from the debug log.
 
 ---
 
