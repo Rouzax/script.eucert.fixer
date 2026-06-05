@@ -1,8 +1,12 @@
 """
 TMDB provider for certification lookups.
 
-Checks the target country first (direct match), then tries inference
-countries with mapping to the target rating scale.
+Exposes three granular functions for split-tier usage in backfill:
+    fetch_certs  -- single API call, returns {country: rating} dict
+    match_direct -- pure lookup for the target country
+    match_inferred -- walks the inference chain with mapping
+
+The convenience wrapper lookup() calls all three in sequence.
 
 Logging:
     Logger: 'tmdb'
@@ -107,18 +111,15 @@ def resolve_id(
     return None
 
 
-def lookup(
+def fetch_certs(
     tmdb_id: str,
     api_key: str,
-    target_country: str,
-    inference_countries: List[str],
-    mappings: Dict[str, Dict[str, str]],
     media_type: MediaType,
-) -> Tuple[Optional[str], Optional[str]]:
-    """
-    Query TMDB for certifications.
+) -> Optional[Dict[str, str]]:
+    """Fetch certifications from TMDB for all countries.
 
-    Returns (rating, source) or (None, None).
+    Makes a single API call. Returns {country_code: rating} or None on
+    failure. Raises ApiKeyError on 401.
     """
     endpoint = media_type.tmdb_endpoint.format(id=tmdb_id)
     url = "{}{}".format(TMDB_BASE_URL, endpoint)
@@ -128,7 +129,7 @@ def lookup(
     except requests.RequestException as e:
         log.warning("Request failed", event="tmdb.error",
                     tmdb_id=tmdb_id, error=str(e))
-        return None, None
+        return None
 
     if resp.status_code == 401:
         raise ApiKeyError("tmdb")
@@ -136,25 +137,37 @@ def lookup(
     if resp.status_code != 200:
         log.warning("Unexpected status", event="tmdb.error",
                     tmdb_id=tmdb_id, status=resp.status_code)
-        return None, None
+        return None
 
     try:
         results = resp.json().get("results", [])
     except ValueError:
         log.warning("Invalid JSON response", event="tmdb.error",
                     tmdb_id=tmdb_id)
-        return None, None
+        return None
 
-    certs = _normalize_certs(media_type.tmdb_parse_certs(results))
+    return _normalize_certs(media_type.tmdb_parse_certs(results))
+
+
+def match_direct(
+    certs: Dict[str, str],
+    target_country: str,
+) -> Tuple[Optional[str], Optional[str]]:
+    """Check for a direct certification match for the target country."""
     target = target_country.upper()
-
-    # Direct match
     if target in certs:
-        log.debug("Direct match", country=target,
-                  rating=certs[target], tmdb_id=tmdb_id)
+        log.debug("Direct match", country=target, rating=certs[target])
         return certs[target], "tmdb-{}".format(target)
+    return None, None
 
-    # Inference from similar countries
+
+def match_inferred(
+    certs: Dict[str, str],
+    target_country: str,
+    inference_countries: List[str],
+    mappings: Dict[str, Dict[str, str]],
+) -> Tuple[Optional[str], Optional[str]]:
+    """Try to infer a rating from similar countries' certifications."""
     for country in inference_countries:
         country_upper = country.upper()
         if country_upper in certs and country_upper in mappings:
@@ -162,12 +175,35 @@ def lookup(
             mapped = mappings[country_upper].get(foreign_rating)
             if mapped:
                 log.debug("Inferred rating", country=country_upper,
-                          foreign_rating=foreign_rating, mapped=mapped,
-                          tmdb_id=tmdb_id)
+                          foreign_rating=foreign_rating, mapped=mapped)
                 return mapped, "tmdb-inferred-{}".format(country_upper)
             else:
                 log.debug("No mapping for rating", country=country_upper,
-                          rating=foreign_rating, tmdb_id=tmdb_id)
+                          rating=foreign_rating)
 
-    log.debug("No certification found", tmdb_id=tmdb_id)
+    log.debug("No inferred certification found", target=target_country)
     return None, None
+
+
+def lookup(
+    tmdb_id: str,
+    api_key: str,
+    target_country: str,
+    inference_countries: List[str],
+    mappings: Dict[str, Dict[str, str]],
+    media_type: MediaType,
+) -> Tuple[Optional[str], Optional[str]]:
+    """Query TMDB for certifications (convenience wrapper).
+
+    Makes a single API call, checks direct match, then inferred.
+    Returns (rating, source) or (None, None).
+    """
+    certs = fetch_certs(tmdb_id, api_key, media_type)
+    if certs is None:
+        return None, None
+
+    rating, source = match_direct(certs, target_country)
+    if rating:
+        return rating, source
+
+    return match_inferred(certs, target_country, inference_countries, mappings)

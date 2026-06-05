@@ -2,7 +2,8 @@
 Backfill orchestration.
 
 Coordinates the multi-tier rating lookup for a single media type:
-TMDB direct -> TMDB inferred -> country scrapers -> OMDB -> fallback.
+TMDB direct -> native scraper -> inference chain (TMDB + scrapers
+by cultural relevance) -> OMDB -> fallback.
 
 Logging:
     Logger: 'backfill'
@@ -15,7 +16,7 @@ Logging:
 from __future__ import annotations
 
 import time
-from typing import Dict, Optional, Set, Tuple
+from typing import Dict, List, Optional, Set, Tuple
 
 from resources.lib.constants import (
     DEFAULT_FALLBACK_RATING,
@@ -43,6 +44,7 @@ _SCRAPERS = [
 ]
 
 _SCRAPER_MODULES = {name: module for name, module, _ in _SCRAPERS}
+_SCRAPER_BY_COUNTRY = {country: (name, module) for name, module, country in _SCRAPERS}
 
 
 def _build_enabled_scrapers() -> Set[str]:
@@ -158,17 +160,26 @@ def backfill(media_type: MediaType) -> Dict[str, int]:
                 if tmdb_id:
                     time.sleep(rate_limit)
 
-            # Tier 1+2: TMDB direct + inference
+            # Tier 1: TMDB direct (target country certification)
+            tmdb_certs = None
             if not rating and tmdb_id and tmdb_key and tmdb_valid:
-                rating, source = tmdb.lookup(
-                    tmdb_id, tmdb_key, target,
-                    inference_countries, mappings, media_type,
-                )
+                tmdb_certs = tmdb.fetch_certs(tmdb_id, tmdb_key, media_type)
                 time.sleep(rate_limit)
 
-            # Tier 3: Country scrapers (native scraper for target country first)
+            if tmdb_certs and not rating:
+                rating, source = tmdb.match_direct(tmdb_certs, target)
+
+            # Tier 2: Native scraper (e.g., FSK for DE, BBFC for GB)
             if not rating:
-                rating, source = _try_scrapers(
+                rating, source = _try_native_scraper(
+                    title, rate_limit, imdb_id, media_type.name,
+                    item_year, target, enabled_scrapers,
+                )
+
+            # Tier 3: Inference chain (TMDB certs + scrapers by cultural relevance)
+            if not rating:
+                rating, source = _try_inference_chain(
+                    inference_countries, tmdb_certs,
                     title, rate_limit, imdb_id, media_type.name,
                     item_year, target, mappings, enabled_scrapers,
                 )
@@ -242,23 +253,25 @@ def _map_native_rating(
     return table.get(native_rating)
 
 
-def _try_scrapers(
+def _try_native_scraper(
     title: str,
     rate_limit: float,
     imdb_id: Optional[str],
     media_type_name: str,
     year: int,
     target: str,
-    mappings: Dict[str, Dict[str, str]],
     enabled_scrapers: Set[str],
 ) -> Tuple[Optional[str], Optional[str]]:
-    """Try enabled country scrapers, native scraper for target country first."""
-    ordered = sorted(
-        _SCRAPERS,
-        key=lambda s: 0 if s[2] == target or (target == "BE" and s[2] == "NL") else 1,
-    )
+    """Try the scraper for the target country (or NL for BE)."""
+    candidates = [target]
+    if target == "BE":
+        candidates.append("NL")
 
-    for name, module, country in ordered:
+    for country in candidates:
+        entry = _SCRAPER_BY_COUNTRY.get(country)
+        if not entry:
+            continue
+        name, module = entry
         if name not in enabled_scrapers:
             continue
 
@@ -268,7 +281,53 @@ def _try_scrapers(
 
         native, src = module.lookup(title, rate_limit, **kwargs)
         if native and src:
-            mapped = _map_native_rating(native, country, target, mappings)
+            return native, src
+        time.sleep(rate_limit)
+
+    return None, None
+
+
+def _try_inference_chain(
+    inference_countries: List[str],
+    tmdb_certs: Optional[Dict[str, str]],
+    title: str,
+    rate_limit: float,
+    imdb_id: Optional[str],
+    media_type_name: str,
+    year: int,
+    target: str,
+    mappings: Dict[str, Dict[str, str]],
+    enabled_scrapers: Set[str],
+) -> Tuple[Optional[str], Optional[str]]:
+    """Walk the inference chain, trying TMDB certs then scrapers per country."""
+    for country in inference_countries:
+        uc = country.upper()
+
+        if tmdb_certs and uc in tmdb_certs:
+            foreign_rating = tmdb_certs[uc]
+            mapped = mappings.get(uc, {}).get(foreign_rating)
+            if mapped:
+                log.debug("Inferred from TMDB", country=uc,
+                          foreign_rating=foreign_rating, mapped=mapped)
+                return mapped, "tmdb-inferred-{}".format(uc)
+            log.debug("TMDB cert unmappable, skipping scraper too",
+                      country=uc, rating=foreign_rating)
+            continue
+
+        entry = _SCRAPER_BY_COUNTRY.get(uc)
+        if not entry:
+            continue
+        name, module = entry
+        if name not in enabled_scrapers:
+            continue
+
+        kwargs = {"media_type_name": media_type_name, "year": year}
+        if name == "fsk":
+            kwargs["imdb_id"] = imdb_id
+
+        native, src = module.lookup(title, rate_limit, **kwargs)
+        if native and src:
+            mapped = _map_native_rating(native, uc, target, mappings)
             if mapped:
                 return mapped, src
             log.debug("No mapping for scraper rating",

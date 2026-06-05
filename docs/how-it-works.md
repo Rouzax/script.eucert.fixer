@@ -19,13 +19,15 @@ When the addon processes an uncertified item, it works through the following ste
 **Step 1: Check TMDB for your country's certification directly.**
 TMDB carries age certifications submitted by distributors in many countries. If your chosen country's certification is already there, the addon uses it.
 
-**Step 2: Check TMDB for a certification from a similar country and convert it.**
-If TMDB has no certification for your country, the addon checks whether TMDB has a certification from a list of culturally similar countries. If it finds one, it converts that certification to your country's scale. When a foreign certification falls between two values on your country's scale, the stricter of the two is used.
+**Step 2: Check your country's national rating authority.**
+If your country has a supported scraper (e.g., [FSK](rating-systems.md#fsk-germany) for Germany, [BBFC](rating-systems.md#bbfc-united-kingdom) for the United Kingdom, [Medieraadet](rating-systems.md#medieraadet-denmark) for Denmark, or [Kijkwijzer](rating-systems.md#kijkwijzer-netherlands-belgium) for the Netherlands and Belgium), the addon searches that authority's website directly. This certification is authoritative for your country and needs no conversion.
 
-**Step 3: Search national rating authority websites.**
-The addon can search the German ([FSK](rating-systems.md#fsk-germany)), British ([BBFC](rating-systems.md#bbfc-united-kingdom)), Danish ([Medieraadet](rating-systems.md#medieraadet-denmark)), and Dutch ([Kijkwijzer](rating-systems.md#kijkwijzer-netherlands-belgium)) rating authority websites directly. Each enabled scraper searches for the title and returns a certification from that authority's own database. The result is then converted to your country's scale using the same conservative approach described above.
+You can enable or disable each scraper in the addon settings.
 
-You can enable or disable each scraper in the addon settings. The scraper for your own country runs first, since its certification needs no conversion.
+**Step 3: Check similar countries, in order of cultural relevance.**
+The addon walks through a list of culturally similar countries, ordered from most to least relevant for your chosen country. For each country in the list, it first checks whether TMDB has a certification and converts it to your country's scale. If TMDB has no certification for that country but a scraper is available and enabled, the addon searches that scraper instead and converts the result. When a foreign certification falls between two values on your country's scale, the stricter of the two is used.
+
+If TMDB already has a certification for a country but it cannot be mapped, the addon skips the scraper for that country too, since the scraper would return the same country's certification with the same mapping problem.
 
 **Step 4: Check OMDB.**
 OMDB is an independent database that carries US MPAA certifications. The addon looks up the title by its IMDB ID and converts the US certification to your country's scale.
