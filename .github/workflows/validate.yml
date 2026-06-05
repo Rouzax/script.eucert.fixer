@@ -21,7 +21,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install kodistubs pyright pyflakes kodi-addon-checker requests
+          pip install kodistubs pyright pyflakes kodi-addon-checker requests pytest pytest-mock
 
       - name: Syntax check
         run: |
@@ -36,6 +36,9 @@ jobs:
 
       - name: Pyright
         run: pyright
+
+      - name: Tests
+        run: python3 -m pytest tests/ -v
 
       - name: Kodi addon checker
         run: kodi-addon-checker --branch omega .
