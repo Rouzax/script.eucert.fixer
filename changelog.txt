@@ -1,3 +1,17 @@
+v0.3.5 (2026-06-05)
+--------------------------
+Bug Fixes:
+  - Fixed: Kijkwijzer scraper blocked by Akamai bot detection on hosts with OpenSSL 3.0 SECLEVEL=2; the restricted 17-cipher TLS handshake triggered a JS challenge. Added a custom HTTPAdapter that sets SECLEVEL=1 to restore the full ~60-cipher set.
+  - Fixed: BBFC and Kijkwijzer canaries matched the wrong BBFC entry for Interstellar (rated 15 instead of 12) because no year filter was applied. Added year=2014 to both canary definitions.
+  - Fixed: Canary failures only logged warnings but did not disable the broken scraper for the scan cycle. A mismatch, no-result, or exception now removes that scraper from the enabled set for the current run.
+  - Fixed: Manual scan (RunScript) skipped canary checks entirely, running scrapers unchecked. Both entry points now run canaries before scanning.
+
+Improvements:
+  - All four scrapers (kijkwijzer, bbfc, fsk, medieraadet) use a shared create_scraper_session() factory with browser-like TLS settings, with graceful fallback on unsupported platforms.
+
+Internal:
+  - 19 new tests covering canary pass/fail/error/skip/passthrough scenarios, TLS adapter behavior, and session factory wiring across all providers.
+
 v0.3.4 (2026-06-05)
 --------------------------
 Improvements:
