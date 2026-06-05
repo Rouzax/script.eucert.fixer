@@ -17,6 +17,7 @@ import os
 import threading
 import time
 import traceback
+import unicodedata
 from contextlib import contextmanager
 from datetime import datetime as dt
 from typing import Any, Dict, Generator, Optional, TextIO, Union
@@ -37,6 +38,47 @@ from resources.lib.constants import (
     LOG_TIMESTAMP_FORMAT,
     LOG_TIMESTAMP_TRIM,
 )
+
+
+_TITLE_SEPARATORS = frozenset((" ", ":", "-"))
+
+
+def normalize_for_compare(text: str) -> str:
+    """Strip diacritics and lowercase for accent-insensitive comparison."""
+    return "".join(
+        c for c in unicodedata.normalize("NFD", text)
+        if unicodedata.category(c) != "Mn"
+    ).lower()
+
+
+def title_matches(result_title: str, search_title: str) -> bool:
+    """Check if result_title matches search_title.
+
+    Tries exact match first (preserving diacritics), then prefix match
+    with separator awareness (space, colon, dash). Falls back to
+    accent-normalized comparison for both.
+    """
+    s_lower = search_title.lower()
+    r_lower = result_title.lower()
+
+    if r_lower == s_lower:
+        return True
+
+    if len(r_lower) > len(s_lower) and r_lower.startswith(s_lower):
+        if r_lower[len(s_lower)] in _TITLE_SEPARATORS:
+            return True
+
+    s_norm = normalize_for_compare(search_title)
+    r_norm = normalize_for_compare(result_title)
+
+    if r_norm == s_norm:
+        return True
+
+    if len(r_norm) > len(s_norm) and r_norm.startswith(s_norm):
+        if r_norm[len(s_norm)] in _TITLE_SEPARATORS:
+            return True
+
+    return False
 
 
 # Singleton addon instance

@@ -157,6 +157,18 @@ class TestFskLookup:
         assert "ratingReleaseDateTo" not in params
 
     @patch("resources.lib.providers.fsk._get_session")
+    def test_tvshow_skips_year_filter(self, mock_session):
+        doc = _make_doc("Pokémon - Staffel 22", 6)
+        mock_session.return_value.get.return_value = _make_response([doc])
+
+        lookup("Pokémon", year=1997, media_type_name="tvshow")
+
+        call_kwargs = mock_session.return_value.get.call_args
+        params = call_kwargs.kwargs.get("params", call_kwargs[1].get("params", {}))
+        assert "ratingReleaseDateFrom" not in params
+        assert "ratingReleaseDateTo" not in params
+
+    @patch("resources.lib.providers.fsk._get_session")
     def test_success_false(self, mock_session):
         resp = MagicMock()
         resp.status_code = 200

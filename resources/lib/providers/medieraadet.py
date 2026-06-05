@@ -19,7 +19,7 @@ from typing import Any, Dict, List, Optional, Tuple
 
 import requests
 
-from resources.lib.utils import get_logger
+from resources.lib.utils import get_logger, title_matches
 
 log = get_logger('medieraadet')
 
@@ -62,18 +62,16 @@ def _strip_article(title: str) -> str:
 
 
 def _title_matches(film_detail: Dict[str, Any], title: str) -> bool:
-    """Check if a film's title matches (case-insensitive, ignoring articles)."""
-    title_lower = title.lower()
-    stripped_lower = _strip_article(title).lower()
+    """Check if a film's title matches (accent-aware, ignoring articles)."""
+    stripped = _strip_article(title)
     for key in ("Title", "OriginalTitle", "DanishTitle"):
         val = film_detail.get(key, "")
         if not val:
             continue
-        val_lower = val.lower()
-        if val_lower == title_lower or val_lower == stripped_lower:
+        if title_matches(val, title) or title_matches(val, stripped):
             return True
-        val_stripped = _strip_article(val).lower()
-        if val_stripped == title_lower or val_stripped == stripped_lower:
+        val_stripped = _strip_article(val)
+        if title_matches(val_stripped, title) or title_matches(val_stripped, stripped):
             return True
     return False
 

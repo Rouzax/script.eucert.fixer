@@ -22,7 +22,7 @@ from typing import Any, Dict, List, Optional, Tuple
 import requests
 
 from resources.lib.constants import BBFC_SEARCH_URL
-from resources.lib.utils import get_logger
+from resources.lib.utils import get_logger, title_matches
 
 log = get_logger('bbfc')
 
@@ -121,8 +121,6 @@ def lookup(
         log.debug("No results", title=title)
         return None, None
 
-    title_lower = title.lower()
-
     best_match = None
     for result in results:
         if not _media_type_filter(result, media_type_name):
@@ -130,7 +128,7 @@ def lookup(
 
         result_title = result.get("title", "")
         result_bare = _YEAR_SUFFIX_RE.sub("", result_title).strip()
-        if result_bare.lower() != title_lower:
+        if not title_matches(result_bare, title):
             continue
 
         classification = result.get("classification", "")

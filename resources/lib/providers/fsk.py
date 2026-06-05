@@ -19,7 +19,7 @@ from typing import Any, Dict, List, Optional, Tuple
 import requests
 
 from resources.lib.constants import FSK_API_URL
-from resources.lib.utils import get_logger
+from resources.lib.utils import get_logger, title_matches
 
 log = get_logger('fsk')
 
@@ -45,18 +45,10 @@ def _extract_imdb_ids(doc: Dict[str, Any]) -> List[str]:
 
 
 def _title_matches(doc: Dict[str, Any], title: str) -> bool:
-    """Check if a doc's title matches the search title (case-insensitive).
-
-    For TV series, FSK lists individual episodes with titles like
-    "BREAKING BAD SEASON 1 - AND THE BAG'S IN THE RIVER". A prefix
-    match handles this.
-    """
-    title_lower = title.lower()
+    """Check if a doc's title matches the search title."""
     for field in ("mainTitle", "mainOriginalTitle"):
-        val = doc.get(field, "").lower()
-        if not val:
-            continue
-        if val == title_lower or val.startswith(title_lower + " "):
+        val = doc.get(field, "")
+        if val and title_matches(val, title):
             return True
     return False
 
@@ -94,7 +86,7 @@ def lookup(
     }
     params.update(type_options)
 
-    if year > 0:
+    if year > 0 and media_type_name != "tvshow":
         params["ratingReleaseDateFrom"] = "{}-01-01".format(year - 1)
         params["ratingReleaseDateTo"] = "{}-12-31".format(year + 1)
 

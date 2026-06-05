@@ -21,7 +21,7 @@ from typing import Any, Dict, List, Optional, Tuple
 import requests
 
 from resources.lib.constants import KIJKWIJZER_USER_AGENT
-from resources.lib.utils import get_logger
+from resources.lib.utils import get_logger, title_matches
 
 log = get_logger('kijkwijzer_provider')
 
@@ -134,15 +134,12 @@ def lookup(
         log.debug("No results", title=title)
         return None, None
 
-    title_lower = title.lower()
-
     for result in results:
         result_title = result["title"]
         inverted = _INVERTED_ARTICLE_RE.match(result_title)
         if inverted:
             result_title = "{} {}".format(inverted.group(2), inverted.group(1))
-        result_lower = result_title.lower()
-        if result_lower != title_lower and not result_lower.startswith(title_lower + " "):
+        if not title_matches(result_title, title):
             continue
 
         if year > 0 and result["year"] > 0 and abs(result["year"] - year) > 1:

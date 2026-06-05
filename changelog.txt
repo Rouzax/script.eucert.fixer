@@ -1,3 +1,12 @@
+v0.3.4 (2026-06-05)
+--------------------------
+Improvements:
+  - Scraper title matching now uses accent normalization as fallback (Pokémon matches Pokemon)
+  - Separator-aware prefix matching: titles with colon, dash, or space suffixes now match (e.g. "Pokémon: XY" matches search for "Pokémon")
+  - Shared title_matches() utility used by all four scrapers for consistent behavior
+  - BBFC now supports prefix matching (previously exact-only)
+  - FSK year filter skipped for TV shows; FSK classifies seasons years after air date, causing false negatives for older series
+
 v0.3.3 (2026-06-05)
 --------------------------
 Improvements:
