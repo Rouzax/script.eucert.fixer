@@ -10,8 +10,8 @@ Logging:
         - manual.start (INFO): Manual scan triggered
         - manual.complete (INFO): Manual scan finished
 """
-from resources.lib.utils import get_bool_setting, get_logger, notify
-from resources.lib.data.backfill import backfill
+from resources.lib.utils import get_bool_setting, get_float_setting, get_logger, notify
+from resources.lib.data.backfill import backfill, run_canaries, _build_enabled_scrapers
 from resources.lib.data.media_types import MOVIE, TVSHOW
 
 log = get_logger('default')
@@ -20,10 +20,15 @@ log = get_logger('default')
 def main() -> None:
     log.info("Manual scan triggered", event="manual.start")
 
+    verified_scrapers = run_canaries(
+        _build_enabled_scrapers(),
+        get_float_setting('rate_limit', 0.25),
+    )
+
     media_types = [MOVIE, TVSHOW]
     stats = {}
     for media_type in media_types:
-        result = backfill(media_type)
+        result = backfill(media_type, verified_scrapers)
         stats[media_type.name] = result
 
     total = sum(

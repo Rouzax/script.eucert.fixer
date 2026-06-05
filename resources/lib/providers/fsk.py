@@ -19,7 +19,7 @@ from typing import Any, Dict, List, Optional, Tuple
 import requests
 
 from resources.lib.constants import FSK_API_URL
-from resources.lib.utils import get_logger, title_matches
+from resources.lib.utils import create_scraper_session, get_logger, title_matches
 
 log = get_logger('fsk')
 
@@ -30,7 +30,7 @@ def _get_session() -> requests.Session:
     """Get a reusable requests session."""
     global _session
     if _session is None:
-        _session = requests.Session()
+        _session = create_scraper_session()
     return _session
 
 

@@ -118,7 +118,7 @@ def _run_scan() -> int:
     total_set = 0
     try:
         with log_timing(log, "scan_cycle") as timer:
-            run_canaries(
+            verified_scrapers = run_canaries(
                 _build_enabled_scrapers(),
                 get_float_setting('rate_limit', 0.25),
             )
@@ -127,7 +127,7 @@ def _run_scan() -> int:
             media_types = [MOVIE, TVSHOW]
 
             for media_type in media_types:
-                stats = backfill(media_type)
+                stats = backfill(media_type, verified_scrapers)
                 count = (
                     stats.get("tmdb_direct", 0) +
                     stats.get("tmdb_inferred", 0) +

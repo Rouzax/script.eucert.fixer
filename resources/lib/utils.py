@@ -14,13 +14,17 @@ from __future__ import annotations
 
 import json
 import os
+import ssl
 import threading
 import time
 import traceback
 import unicodedata
 from contextlib import contextmanager
 from datetime import datetime as dt
-from typing import Any, Dict, Generator, Optional, TextIO, Union
+from typing import TYPE_CHECKING, Any, Dict, Generator, Optional, TextIO, Union
+
+if TYPE_CHECKING:
+    import requests
 
 import xbmc
 import xbmcaddon
@@ -79,6 +83,31 @@ def title_matches(result_title: str, search_title: str) -> bool:
             return True
 
     return False
+
+
+def create_scraper_session() -> "requests.Session":
+    """Create a requests session with browser-like TLS settings.
+
+    OpenSSL 3.0 SECLEVEL=2 restricts the cipher list to ~17 entries,
+    producing a JA3 fingerprint that Akamai flags as non-browser.
+    SECLEVEL=1 restores the full ~60-cipher set.
+    """
+    import requests
+    from requests.adapters import HTTPAdapter
+
+    class _BrowserTLSAdapter(HTTPAdapter):
+        def init_poolmanager(self, *args, **kwargs):  # type: ignore[override]
+            try:
+                ctx = ssl.create_default_context()
+                ctx.set_ciphers("DEFAULT:@SECLEVEL=1")
+                kwargs["ssl_context"] = ctx
+            except (ssl.SSLError, ValueError):
+                pass
+            return super().init_poolmanager(*args, **kwargs)
+
+    session = requests.Session()
+    session.mount("https://", _BrowserTLSAdapter())
+    return session
 
 
 # Singleton addon instance

@@ -61,9 +61,15 @@ def _build_enabled_scrapers() -> Set[str]:
     return enabled
 
 
-def backfill(media_type: MediaType) -> Dict[str, int]:
+def backfill(
+    media_type: MediaType,
+    enabled_scrapers: Optional[Set[str]] = None,
+) -> Dict[str, int]:
     """
     Run the full rating backfill for a single media type.
+
+    When enabled_scrapers is provided (e.g. filtered by canaries),
+    it is used instead of reading scraper settings directly.
 
     Returns a stats dict with counts per source.
     """
@@ -94,7 +100,8 @@ def backfill(media_type: MediaType) -> Dict[str, int]:
         fallback_rating = raw_fallback if raw_fallback else DEFAULT_FALLBACK_RATING
         retry_days = get_int_setting('retry_days', DEFAULT_RETRY_DAYS)
     rate_limit = get_float_setting('rate_limit', DEFAULT_RATE_LIMIT_SEC)
-    enabled_scrapers = _build_enabled_scrapers()
+    if enabled_scrapers is None:
+        enabled_scrapers = _build_enabled_scrapers()
     replace_incorrect = get_bool_setting('replace_incorrect')
 
     unresolved = load_tracker(media_type.tracker_filename)
@@ -338,8 +345,13 @@ def _try_inference_chain(
     return None, None
 
 
-def run_canaries(enabled_scrapers: Set[str], rate_limit: float) -> None:
-    """Test each enabled scraper with a known title to detect breakage."""
+def run_canaries(enabled_scrapers: Set[str], rate_limit: float) -> Set[str]:
+    """Test each enabled scraper with a known title to detect breakage.
+
+    Returns the subset of enabled_scrapers that passed their canary.
+    Scrapers without a canary definition pass through unchanged.
+    """
+    failed = set()  # type: Set[str]
     for name, canary in SCRAPER_CANARIES.items():
         if name not in enabled_scrapers:
             continue
@@ -357,22 +369,27 @@ def run_canaries(enabled_scrapers: Set[str], rate_limit: float) -> None:
         try:
             rating, _ = module.lookup(title, rate_limit, **kwargs)
         except Exception:
-            log.warning("Canary request failed",
+            log.warning("Canary request failed, scraper disabled for this cycle",
                         event="scraper.canary_error", scraper=name, title=title)
+            failed.add(name)
             time.sleep(rate_limit)
             continue
 
         if rating == expected:
             log.debug("Canary passed", scraper=name, title=title, rating=rating)
         elif rating is None:
-            log.warning("Canary returned no result; scraper may be broken",
+            log.warning("Canary returned no result, scraper disabled for this cycle",
                         event="scraper.canary_fail",
                         scraper=name, title=title, expected=expected)
+            failed.add(name)
         else:
-            log.warning("Canary returned unexpected rating; scraper may have changed",
+            log.warning("Canary returned unexpected rating, scraper disabled for this cycle",
                         event="scraper.canary_mismatch",
                         scraper=name, title=title, expected=expected, got=rating)
+            failed.add(name)
         time.sleep(rate_limit)
+
+    return enabled_scrapers - failed
 
 
 def _stat_key(source: Optional[str]) -> str:

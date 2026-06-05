@@ -21,7 +21,7 @@ from typing import Any, Dict, List, Optional, Tuple
 import requests
 
 from resources.lib.constants import KIJKWIJZER_USER_AGENT
-from resources.lib.utils import get_logger, title_matches
+from resources.lib.utils import create_scraper_session, get_logger, title_matches
 
 log = get_logger('kijkwijzer_provider')
 
@@ -53,7 +53,7 @@ def _get_session() -> requests.Session:
     """Get a reusable requests session."""
     global _session
     if _session is None:
-        _session = requests.Session()
+        _session = create_scraper_session()
         _session.headers["User-Agent"] = KIJKWIJZER_USER_AGENT
         _session.headers.update(_SEARCH_HEADERS)
         _session.cookies.set("PerplexCookieApproval", "2",
