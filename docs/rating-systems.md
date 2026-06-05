@@ -218,14 +218,17 @@ To see how this works end to end, consider this scenario.
 
 Suppose you selected Netherlands. A film has no Dutch certification on TMDB, but it does have a BBFC 15 from the UK. Here is what happens:
 
-1. The addon finds no Kijkwijzer certification on TMDB for this film.
-2. It checks Belgium (same system), but no certification exists there either.
-3. It checks Germany, Austria, France, and then the UK.
-4. The UK has a BBFC 15. The addon looks up the UK-to-Netherlands mapping table.
-5. BBFC 15 maps to Kijkwijzer 16. The stricter option (16 rather than 14) is chosen because the BBFC 15 threshold sits above the Dutch 14 line.
-6. The addon writes "16" to your Kodi library.
+1. The addon checks TMDB for a Dutch (NL) certification. None exists.
+2. It tries Kijkwijzer (your country's national scraper). No result.
+3. It starts walking the inference chain in order of cultural relevance: Belgium, Germany, Austria, France, United Kingdom, and so on.
+4. For Belgium: TMDB has no Belgian certification. No Belgian scraper exists. Move on.
+5. For Germany: TMDB has no German certification. The FSK scraper is tried, but FSK has no result either. Move on.
+6. For Austria and France: no TMDB certifications and no scrapers. Move on.
+7. For the United Kingdom: TMDB has a BBFC 15. The addon looks up the UK-to-Netherlands mapping table.
+8. BBFC 15 maps to Kijkwijzer 16. The stricter option (16 rather than 14) is chosen because the BBFC 15 threshold sits above the Dutch 14 line.
+9. The addon writes "NL:16" to your Kodi library.
 
-This same approach applies to all sources: TMDB inference, OMDB (US certifications), and the national scrapers (FSK, BBFC, Kijkwijzer). Every foreign certification passes through the mapping table for your selected country before it is written.
+Notice how for each country in the chain, the addon checks TMDB first and then falls back to the national scraper for that country (if one exists and is enabled). This means a scraper can fill in gaps where TMDB has no data for a culturally close country.
 
 You can customize these mapping tables if you disagree with specific conversions. See [FAQ: Can I customize the certification mappings?](faq.md#can-i-customize-the-certification-mappings) for details.
 
