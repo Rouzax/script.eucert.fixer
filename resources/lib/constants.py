@@ -87,7 +87,7 @@ KIJKWIJZER_USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/5
 
 SCRAPER_CANARIES = {
     "fsk": {"title": "The Matrix", "expected": "16", "year": 1999},
-    "bbfc": {"title": "Interstellar", "expected": "12"},
+    "bbfc": {"title": "Interstellar", "expected": "12", "year": 2014},
     "medieraadet": {"title": "Interstellar", "expected": "11", "year": 2014},
-    "kijkwijzer": {"title": "Interstellar", "expected": "12"},
+    "kijkwijzer": {"title": "Interstellar", "expected": "12", "year": 2014},
 }
