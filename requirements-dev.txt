@@ -1,0 +1,23 @@
+# Pinned development and CI tooling for script.eucert.fixer.
+#
+# Runtime deps are provided by Kodi (script.module.requests); nothing here ships
+# in the addon zip. Versions are pinned exactly for reproducible CI and to keep
+# control over upgrades (see CLAUDE.md supply-chain rules). Install with:
+#
+#     pip install -r requirements-dev.txt
+#
+# Bump deliberately, not via blanket upgrades.
+
+kodistubs==21.0.0          # Kodi Python API stubs (xbmc, xbmcgui, ...)
+pyright==1.1.408           # static type checker (Python 3.8 floor via pyrightconfig.json)
+ruff==0.15.5               # linter + import sorter (replaces pyflakes)
+vulture==2.16              # dead-code detection
+pre-commit==4.6.0          # git hook runner
+
+pytest==9.0.2              # test runner
+pytest-mock==3.15.1        # mocker fixture
+pytest-cov==7.1.0          # coverage plugin
+coverage==7.13.4           # coverage engine (pytest-cov dependency, pinned for reproducibility)
+
+requests==2.33.1           # used directly in provider tests
+kodi-addon-checker==0.0.36 # official Kodi repo pre-validation

@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import pytest
 
-from resources.lib.data.kodi import _strip_rating_prefix, _needs_rating
+from resources.lib.data.kodi import _needs_rating, _strip_rating_prefix
 
 NL_RATINGS = ("AL", "6", "9", "12", "14", "16", "18")
 DE_RATINGS = ("0", "6", "12", "16", "18")

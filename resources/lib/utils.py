@@ -43,7 +43,6 @@ from resources.lib.constants import (
     LOG_TIMESTAMP_TRIM,
 )
 
-
 _TITLE_SEPARATORS = frozenset((" ", ":", "-"))
 
 

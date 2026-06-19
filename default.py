@@ -10,9 +10,9 @@ Logging:
         - manual.start (INFO): Manual scan triggered
         - manual.complete (INFO): Manual scan finished
 """
-from resources.lib.utils import get_bool_setting, get_float_setting, get_logger, notify
-from resources.lib.data.backfill import backfill, run_canaries, _build_enabled_scrapers
+from resources.lib.data.backfill import _build_enabled_scrapers, backfill, run_canaries
 from resources.lib.data.media_types import MOVIE, TVSHOW
+from resources.lib.utils import get_bool_setting, get_float_setting, get_logger, notify
 
 log = get_logger('default')
 

@@ -24,13 +24,17 @@ from resources.lib.constants import (
     LIBRARY_SCAN_DEBOUNCE_SEC,
     SERVICE_SLEEP_INTERVAL_SEC,
 )
-from resources.lib.utils import (
-    StructuredLogger, get_bool_setting, get_float_setting, get_logger, get_int_setting,
-    log_timing, notify,
-)
-from resources.lib.data.backfill import backfill, run_canaries, _build_enabled_scrapers
+from resources.lib.data.backfill import _build_enabled_scrapers, backfill, run_canaries
 from resources.lib.data.media_types import MOVIE, TVSHOW
-
+from resources.lib.utils import (
+    StructuredLogger,
+    get_bool_setting,
+    get_float_setting,
+    get_int_setting,
+    get_logger,
+    log_timing,
+    notify,
+)
 
 log = get_logger('service')
 

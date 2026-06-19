@@ -4,7 +4,7 @@ from __future__ import annotations
 import json
 from unittest.mock import MagicMock, patch
 
-from resources.lib.providers.bbfc import lookup, _parse_next_data
+from resources.lib.providers.bbfc import _parse_next_data, lookup
 
 
 def _make_html(results):

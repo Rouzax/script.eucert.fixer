@@ -20,8 +20,11 @@ import os
 from typing import Any, Dict
 
 from resources.lib.constants import (
-    CONFIG_DIR, CONFIG_FILENAME, DEFAULT_ADDON_ID,
-    DEFAULT_COUNTRY_CODE, PRESETS_DIR,
+    CONFIG_DIR,
+    CONFIG_FILENAME,
+    DEFAULT_ADDON_ID,
+    DEFAULT_COUNTRY_CODE,
+    PRESETS_DIR,
 )
 from resources.lib.utils import get_addon, get_logger
 

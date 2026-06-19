@@ -8,7 +8,6 @@ from unittest.mock import MagicMock
 
 import pytest
 
-
 # ---------------------------------------------------------------------------
 # Kodi module stubs - must be injected before any addon code is imported
 # ---------------------------------------------------------------------------

@@ -6,7 +6,11 @@ from unittest.mock import MagicMock, patch
 import pytest
 
 from resources.lib.providers.tmdb import (
-    resolve_id, lookup, fetch_certs, match_direct, match_inferred,
+    fetch_certs,
+    lookup,
+    match_direct,
+    match_inferred,
+    resolve_id,
 )
 from resources.lib.utils import ApiKeyError
 

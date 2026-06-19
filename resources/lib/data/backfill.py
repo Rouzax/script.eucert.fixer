@@ -18,20 +18,26 @@ from __future__ import annotations
 import time
 from typing import Dict, List, Optional, Set, Tuple
 
+from resources.lib.config import load_inference_config
 from resources.lib.constants import (
     DEFAULT_FALLBACK_RATING,
     DEFAULT_RATE_LIMIT_SEC,
     DEFAULT_RETRY_DAYS,
     SCRAPER_CANARIES,
 )
-from resources.lib.config import load_inference_config
 from resources.lib.data.kodi import get_items_needing_ratings, update_rating
 from resources.lib.data.media_types import MediaType
 from resources.lib.data.tracker import load_tracker, save_tracker, should_apply_fallback
-from resources.lib.providers import tmdb, omdb, kijkwijzer, fsk, bbfc, medieraadet, tvmaze
+from resources.lib.providers import bbfc, fsk, kijkwijzer, medieraadet, omdb, tmdb, tvmaze
 from resources.lib.utils import (
-    ApiKeyError, get_country_code, get_logger, get_setting, get_bool_setting,
-    get_int_setting, get_float_setting, notify,
+    ApiKeyError,
+    get_bool_setting,
+    get_country_code,
+    get_float_setting,
+    get_int_setting,
+    get_logger,
+    get_setting,
+    notify,
 )
 
 log = get_logger('backfill')

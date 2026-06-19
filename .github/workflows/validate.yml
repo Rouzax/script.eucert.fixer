@@ -21,15 +21,17 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install kodistubs pyright pyflakes kodi-addon-checker requests pytest pytest-mock
+          pip install -r requirements-dev.txt
 
       - name: Syntax check
         run: |
           find . -name "*.py" -not -path "*/__pycache__/*" -exec python3 -m py_compile {} \;
 
-      - name: Pyflakes
-        run: |
-          pyflakes $(find . -name "*.py" -not -path "*/__pycache__/*")
+      - name: Ruff (lint + import order)
+        run: ruff check .
+
+      - name: Vulture (dead code)
+        run: vulture
 
       - name: Clean __pycache__
         run: find . -type d -name __pycache__ -exec rm -rf {} + 2>/dev/null || true
@@ -38,7 +40,7 @@ jobs:
         run: pyright
 
       - name: Tests
-        run: python3 -m pytest tests/ -v
+        run: python3 -m pytest tests/ -v --cov --cov-report=term-missing
 
       - name: Kodi addon checker
         run: |
@@ -54,6 +56,8 @@ jobs:
             --exclude=.claudeignore --exclude=.mcp.json \
             --exclude=mkdocs.yml --exclude=pyrightconfig.json \
             --exclude=.pyflakes --exclude=.gitignore \
+            --exclude=pyproject.toml --exclude=requirements-dev.txt \
+            --exclude=.pre-commit-config.yaml \
             --exclude=README.md --exclude=TODO.md --exclude=pytest.ini \
             . /tmp/addon-check/script.eucert.fixer/
           kodi-addon-checker --branch omega /tmp/addon-check

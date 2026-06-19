@@ -41,7 +41,7 @@ _CODE_TO_RATING = {
     "to15": "15",
 }
 
-_ARTICLE_RE = re.compile(r'^(?:the|a|an|der|die|das|den|det|de|le|la|les|el|los|las)\s+', re.IGNORECASE)
+_ARTICLE_RE = re.compile(r'^(?:the|a|an|der|die|das|den|det|de|le|la|les|el|los|las)\s+', re.IGNORECASE)  # noqa: E501
 
 _session: Optional[requests.Session] = None
 

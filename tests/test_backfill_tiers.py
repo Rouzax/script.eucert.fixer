@@ -4,9 +4,9 @@ from __future__ import annotations
 from unittest.mock import MagicMock, patch
 
 from resources.lib.data.backfill import (
-    _try_native_scraper,
-    _try_inference_chain,
     _map_native_rating,
+    _try_inference_chain,
+    _try_native_scraper,
 )
 
 

@@ -26,6 +26,9 @@ pyrightconfig.json
 .ruff_cache/
 .pytest_cache/
 pytest.ini
+.coverage
+.coverage.*
+htmlcov/
 
 # Build output
 build/

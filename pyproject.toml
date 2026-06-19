@@ -1,0 +1,44 @@
+# Development tooling configuration for script.eucert.fixer.
+#
+# This file configures dev/CI tools only (ruff, vulture, coverage). It is NOT
+# packaged into the addon zip and is not read by Kodi at runtime. See
+# requirements-dev.txt for the pinned tool versions and .pre-commit-config.yaml
+# for the local hooks.
+
+# -----------------------------------------------------------------------------
+# Ruff: linter + import sorter (superset of pyflakes).
+# -----------------------------------------------------------------------------
+[tool.ruff]
+# Kodi Windows builds ship Python 3.8; target it so ruff never proposes
+# 3.9+/3.10+ constructs (builtins-as-generics, X | Y unions). pyright enforces
+# the same floor for types.
+target-version = "py38"
+line-length = 100
+extend-exclude = ["_temp", "build", "site", "docker", ".worktrees"]
+
+[tool.ruff.lint]
+# E/W pycodestyle, F pyflakes, B bugbear, I import sorting.
+# UP (pyupgrade) is intentionally OFF: its PEP 585/604 rules rewrite
+# Dict -> dict and Optional[X] -> X | None, which break Python 3.8 type
+# aliases (see CLAUDE.md). pyright is the guard against 3.10+ syntax.
+select = ["E", "F", "W", "B", "I"]
+
+# -----------------------------------------------------------------------------
+# Vulture: dead-code detection (serves the project dead-code policy).
+# -----------------------------------------------------------------------------
+[tool.vulture]
+paths = ["resources"]
+# 80 is clean today; below it, Kodi callbacks (onScanFinished) and
+# cross-referenced constants show up as false positives.
+min_confidence = 80
+
+# -----------------------------------------------------------------------------
+# Coverage: measured over the addon library only.
+# -----------------------------------------------------------------------------
+[tool.coverage.run]
+source = ["resources/lib"]
+omit = ["*/__pycache__/*"]
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = true

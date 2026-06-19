@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from unittest.mock import MagicMock, patch
 
-from resources.lib.providers.medieraadet import lookup, _strip_article
+from resources.lib.providers.medieraadet import _strip_article, lookup
 
 
 class TestStripArticle:
