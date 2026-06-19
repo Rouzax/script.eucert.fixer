@@ -1,0 +1,27 @@
+# Dependabot keeps the SHA-pinned GitHub Actions and the pinned dev tooling
+# current. Updates are grouped into one PR per ecosystem to reduce noise, and a
+# cooldown skips just-published versions (compromised releases tend to surface
+# and get pulled within the first days).
+version: 2
+updates:
+  # Bumps the commit SHAs in .github/workflows/*.yml (comments track the version).
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    cooldown:
+      default-days: 7
+    groups:
+      github-actions:
+        patterns: ["*"]
+
+  # Bumps pinned versions in requirements-dev.txt.
+  - package-ecosystem: "pip"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    cooldown:
+      default-days: 7
+    groups:
+      dev-dependencies:
+        patterns: ["*"]
